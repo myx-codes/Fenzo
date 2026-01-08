@@ -7,7 +7,7 @@ dotenv.config();
 mongoose.connect(process.env.MONGO_URL as string)
 .then((data) => {
     console.log("MondoDB connected Successfully")
-    const PORT = process.env.Port ?? 3000;
+    const PORT = process.env.PORT ?? 3000;
     app.listen(PORT), function(){
         console.log(`Server is running ${PORT}`)
     }
