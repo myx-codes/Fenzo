@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Fenzo is MarketPlace",
   "main": "src/server.ts",
-   "scripts": {
+  "scripts": {
     "start": "ts-node src/server.ts",
     "train": "nodemon --exec ts-node src/train.ts",
     "start:dev": "nodemon --exec ts-node src/server.ts",
@@ -14,18 +14,22 @@
   "license": "ISC",
   "dependencies": {
     "-": "^0.0.1",
-    "@types/express": "^5.0.6",
     "D": "^1.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "express-session": "^1.18.2",
     "moment": "^2.30.1",
     "mongodb": "^7.0.0",
-    "mongoose": "^9.1.2"
+    "mongoose": "^9.1.2",
+    "multer": "^2.0.2"
   },
   "devDependencies": {
+    "@types/multer": "^2.0.0",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "@types/express": "^5.0.6",
+    "@types/express-session": "^1.18.2"
   }
 }
