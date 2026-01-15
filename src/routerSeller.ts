@@ -1,8 +1,16 @@
 import express from  'express';
 import path from 'path';
+import sellerController from './controllers/seller.controller';
 
-const router = express.Router();
+const routerSeller = express.Router();
 
-router.get("/", (req, res) => {res.send("GoHOme")})
+routerSeller
+.get("/", sellerController.goHome)
+.get("/signup", sellerController.getSignup)
+.get("/login", sellerController.getLogin)
 
-export default router;
+routerSeller
+.post("/signup", sellerController.processSignup)
+.post("/login", sellerController.processLogin);
+
+export default routerSeller;

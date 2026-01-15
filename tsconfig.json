@@ -9,6 +9,7 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./",
     "paths": {
+      "src/*": ["src/*"], 
       "*": ["node_modules/*"]
     }
   },
