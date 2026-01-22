@@ -13,4 +13,7 @@ routerSeller
 .post("/signup", sellerController.processSignup)
 .post("/login", sellerController.processLogin);
 
+routerSeller
+.get("/dashboard", sellerController.goDashboard);
+
 export default routerSeller;

@@ -4,6 +4,7 @@ import { Request, Response } from "express"
 import { LoginInput, UserInput } from "../libs/types/user";
 import { UserType } from "../libs/enums/user.enums";
 import SellerService from "../models/Seller.service";
+import { SellerRequest } from "../libs/types/user";
 
 const sellerController: T = {};
 const sellerService = new SellerService();
@@ -43,14 +44,36 @@ sellerController.getLogin = (req: Request, res: Response) => {
 };
 
 
-sellerController.processSignup = async (req: Request, res: Response) => {
+sellerController.goDashboard = (req: SellerRequest, res: Response) => {
+    try {
+        console.log("Seller, goDashboard");
+        if (!req.session?.user) {
+            return res.redirect("/seller/login"); 
+        }
+        res.render("dashboard", { 
+            user: req.session.user  
+        });
+
+    } catch (err) {
+        console.log("Error, goDashboard", err);
+        res.redirect("/seller/login");
+    }
+};
+
+
+sellerController.processSignup = async (req: SellerRequest, res: Response) => {
     try{
         console.log("processSignup");
         console.log("body", req.body);
         const newUser: UserInput = req.body;
         newUser.userType = UserType.SELLER;
         const result = await sellerService.processSignup(newUser);
+
+        //SESSION AUTHENTICATION
+        req.session.user = result;
+        req.session.save(function(){
         res.send(result)
+        });
     }
     catch(err){
         console.log("Error, processSignup:", err);
@@ -59,12 +82,17 @@ sellerController.processSignup = async (req: Request, res: Response) => {
 };
 
 
-sellerController.processLogin = async ( req: Request, res: Response) => {
+sellerController.processLogin = async ( req: SellerRequest, res: Response) => {
     try{
-         console.log("processLogin")
+        console.log("processLogin")
         const input: LoginInput = req.body;
         const result = await sellerService.processLogin(input)
-        res.json(result);
+
+        //SESSION AUTHENTICATION
+        req.session.user = result;
+        req.session.save(function(){
+        res.redirect("/seller/dashboard")
+        });
     }catch(err){
         console.log("Error processLoin")
         if(err instanceof Errors)res.status(err.code).json(err);

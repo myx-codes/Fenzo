@@ -1,11 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <div>Login</div>
-</body>
-</html>
+<%- include('includes/header') %>
+
+<div class="container py-5">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg overflow-hidden rounded-4">
+                <div class="row g-0">
+
+                    <div class="col-md-12 bg-white p-5">
+                        <div class="text-center mb-5">
+                            <h3 class="fw-bold text-dark">Login</h3>
+                            <p class="text-muted">Enter your Username and Password</p>
+                        </div>
+
+                        <form action="/seller/login" method="POST">
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Username</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user text-muted"></i></span>
+                                    <input type="text" name="userNick" class="form-control bg-light border-start-0" placeholder="fenzo_shop" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between">
+                                    <label class="form-label fw-bold">Password</label>
+                                    <a href="#" class="small text-muted text-decoration-none">Forgot password?</a>
+                                </div>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fa-solid fa-lock text-muted"></i>
+                                    </span>
+                                    
+                                    <input type="password" name="userPassword" id="passwordInput" class="form-control bg-light border-start-0 border-end-0" placeholder="********" required>
+                                    
+                                    <button class="btn bg-light border border-start-0 text-muted" type="button" id="togglePassword" style="z-index: 10;">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-outline-dark w-100 btn-lg fw-bold shadow-sm">
+                                Login
+                            </button>
+
+                            <div class="text-center mt-4">
+                                <p class="text-muted">Not a seller yet? <a href="/seller/signup" class="text-warning fw-bold text-decoration-none">Sign Up</a></p>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const passwordInput = document.querySelector('#passwordInput');
+    const icon = togglePassword.querySelector('i');
+
+    togglePassword.addEventListener('click', function (e) {
+        // 1. Input turini o'zgartirish (password <-> text)
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+
+        // 2. Ikonkani o'zgartirish (ko'z <-> chizilgan ko'z)
+        icon.classList.toggle('fa-eye');
+        icon.classList.toggle('fa-eye-slash');
+    });
+</script>
+
+<%- include('includes/footer') %>

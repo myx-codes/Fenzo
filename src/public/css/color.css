@@ -1,0 +1,22 @@
+:root {
+  --fenzo-dark: #1F2933;
+  --fenzo-accent: #F59E0B;
+  --fenzo-bg: #F8FAFC;
+  --fenzo-white: #FFFFFF;
+
+  --fenzo-text-main: #111827;
+  --fenzo-text-muted: #6B7280;
+
+  --fenzo-btn-primary: #F59E0B;
+  --fenzo-btn-primary-hover: #D97706;
+
+  --fenzo-btn-secondary: #374151;
+  --fenzo-btn-secondary-hover: #1F2933;
+
+  --fenzo-success: #16A34A;
+  --fenzo-warning: #F59E0B;
+  --fenzo-error: #DC2626;
+  --fenzo-info: #2563EB;
+
+  --fenzo-border: #E5E7EB;
+}

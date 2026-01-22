@@ -1,11 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <div>Signup</div>
-</body>
-</html>
+<%- include('includes/header') %>
+
+<div class="container py-5">
+    <div class="row justify-content-center align-items-center">
+        
+        <div class="col-lg-6 col-md-8">
+            <div class="card border-0 shadow-lg overflow-hidden rounded-4">
+                <div class="row g-0">
+
+                    <div class="col-12 bg-white p-5">
+                        <div class="text-center mb-4">
+                            <h3 class="fw-bold text-dark">Sign Up</h3>
+                            <p class="text-muted">Enter your details to create an account</p>
+                        </div>
+
+                        <form action="/seller/signup" method="POST">
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user text-muted"></i></span>
+                                    <input type="text" name="memberNick" class="form-control bg-light border-start-0" placeholder="Steven" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Phone Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-phone text-muted"></i></span>
+                                    <input type="text" name="memberPhone" class="form-control bg-light border-start-0" placeholder="+998 90 123 45 67" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
+                                    <input type="password" name="memberPassword" class="form-control bg-light border-start-0" placeholder="********" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Confirm Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-key text-muted"></i></span>
+                                    <input type="password" name="confirm_password" class="form-control bg-light border-start-0" placeholder="********" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-outline-dark w-100 btn-lg fw-bold shadow-sm">
+                                Sign Up
+                            </button>
+
+                            <div class="text-center mt-4">
+                                <p class="text-muted">Already have an account? <a href="/seller/login" class="text-warning fw-bold text-decoration-none">Login</a></p>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('includes/footer') %>

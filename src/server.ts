@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
-import app from './app'
-
 dotenv.config();
 
+import mongoose from 'mongoose';
+import app from './app'
+mongoose.set('strictQuery', false);
 mongoose.connect(process.env.MONGO_URL as string)
 .then((data) => {
     console.log("MondoDB connected Successfully")
