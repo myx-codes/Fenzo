@@ -8,6 +8,17 @@ const userController: T = {};
 const userService = new UserService()
 
 
+userController.goHome = ( req: Request, res: Response) => {
+    try{
+        console.log("User, goHome")
+        res.json("User Home")
+    }catch(err){
+        console.log("Error, goHome", err)
+        if(err instanceof Errors)res.status(err.code).json(err);
+        else res.status(Errors.standard.code).json(Errors.standard);
+    }
+};
+
 
 userController.getSellers = async (req: Request, res: Response) => {
     try {

@@ -11,8 +11,8 @@ const sellerService = new SellerService();
 
 sellerController.goHome = ( req: Request, res: Response) => {
     try{
-        console.log("Member, goHome")
-        res.json("Home")
+        console.log("Seller, goHome")
+        res.render("home")
     }catch(err){
         console.log("Error, goHome", err)
         if(err instanceof Errors)res.status(err.code).json(err);
@@ -24,7 +24,7 @@ sellerController.goHome = ( req: Request, res: Response) => {
 sellerController.getSignup = (req: Request, res: Response) => {
     try{
         console.log("Signup Page");
-        res.send("Signup Page");
+        res.render("signup");
     }
     catch(err){
         console.log("Error, go Signup", err)
@@ -36,7 +36,7 @@ sellerController.getSignup = (req: Request, res: Response) => {
 sellerController.getLogin = (req: Request, res: Response) => {
    try{
      console.log("Login Page")
-    res.send("Login Page")
+    res.render("login")
    }catch(err){
     console.log("ErrorLogin Page", err)
    }

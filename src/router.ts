@@ -4,7 +4,7 @@ import  userController from './controllers/user.controller';
 import ordersController from './controllers/orders.controller';
 const router  = express.Router();
 
-
+router.get('/', userController.goHome)
 router.get('/user/sellers', userController.getSellers);
 // router.get('/user/top-sellers', userController.getTopSellers);
 

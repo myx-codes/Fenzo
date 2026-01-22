@@ -12,6 +12,7 @@ class UserService{
         this.userModel = UserModel;
     }
 
+
     public async getSellers(): Promise<User[]>{
         const result = await this.userModel
         .find({userType: UserType.SELLER})
