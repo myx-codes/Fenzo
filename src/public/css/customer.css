@@ -1,0 +1,72 @@
+/* PAGE HEADER */
+.search-input {
+    width: 260px;
+    font-size: 14px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+/* TABLE */
+.customers-table th {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6b7280;
+    background-color: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 14px 16px;
+}
+
+.customers-table td {
+    padding: 16px;
+    font-size: 14px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.customers-table tr:hover {
+    background-color: #f9fafb;
+}
+
+/* CUSTOMER INFO */
+.customer-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+}
+
+.customer-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--accent-blue);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.customer-avatar.muted {
+    background-color: #9ca3af;
+}
+
+/* STATUS */
+.status-badge {
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.status-badge.active {
+    background-color: #e8f5ee;
+    color: #198754;
+}
+
+.status-badge.inactive {
+    background-color: #f1f5f9;
+    color: #6b7280;
+}

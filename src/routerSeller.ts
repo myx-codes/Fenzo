@@ -14,6 +14,8 @@ routerSeller
 .post("/login", sellerController.processLogin);
 
 routerSeller
-.get("/dashboard", sellerController.goDashboard);
+.get("/dashboard", sellerController.goDashboard)
+.get("/customers", sellerController.getCustomers)
+// .get("/logout", sellerController.logout);
 
 export default routerSeller;

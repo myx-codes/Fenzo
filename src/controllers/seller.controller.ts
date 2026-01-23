@@ -61,6 +61,20 @@ sellerController.goDashboard = (req: SellerRequest, res: Response) => {
 };
 
 
+sellerController.getCustomers = async (req: Request, res: Response) => {
+    try {
+        console.log("customers");
+        const result = await sellerService.getCustomers();
+        res.render("customers")
+    } catch (err) {
+        console.log("Error, customers:", err);
+        
+        if (err instanceof Errors) res.status(err.code).json(err);
+        else res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+
 sellerController.processSignup = async (req: SellerRequest, res: Response) => {
     try{
         console.log("processSignup");

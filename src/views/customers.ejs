@@ -1,0 +1,110 @@
+<%- include('includes/header') %>
+
+<link rel="stylesheet" href="/css/customers.css">
+
+<div class="container py-5">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h1 class="page-title">Customers</h1>
+            <p class="page-subtitle mb-0">
+                View and manage customers who purchased your products
+            </p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <input 
+                type="text" 
+                class="form-control search-input"
+                placeholder="Search customer..."
+            >
+        </div>
+    </div>
+
+    <!-- CUSTOMERS TABLE -->
+    <div class="panel p-0">
+        <table class="table customers-table mb-0">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Email</th>
+                    <th>Total Orders</th>
+                    <th>Total Spent</th>
+                    <th>Last Order</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td>
+                        <div class="customer-info">
+                            <div class="customer-avatar">A</div>
+                            <span>Ali Karimov</span>
+                        </div>
+                    </td>
+                    <td>ali@gmail.com</td>
+                    <td>8</td>
+                    <td>$1,240</td>
+                    <td>2 days ago</td>
+                    <td>
+                        <span class="status-badge active">Active</span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div class="customer-info">
+                            <div class="customer-avatar">S</div>
+                            <span>Sara Lee</span>
+                        </div>
+                    </td>
+                    <td>sara@email.com</td>
+                    <td>3</td>
+                    <td>$520</td>
+                    <td>1 week ago</td>
+                    <td>
+                        <span class="status-badge active">Active</span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div class="customer-info">
+                            <div class="customer-avatar muted">J</div>
+                            <span>John Smith</span>
+                        </div>
+                    </td>
+                    <td>john@demo.com</td>
+                    <td>1</td>
+                    <td>$199</td>
+                    <td>1 month ago</td>
+                    <td>
+                        <span class="status-badge inactive">Inactive</span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div class="customer-info">
+                            <div class="customer-avatar">M</div>
+                            <span>Maria Gomez</span>
+                        </div>
+                    </td>
+                    <td>maria@mail.com</td>
+                    <td>5</td>
+                    <td>$870</td>
+                    <td>3 days ago</td>
+                    <td>
+                        <span class="status-badge active">Active</span>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<%- include('includes/footer') %>

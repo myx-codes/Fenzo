@@ -12,6 +12,16 @@ class SellerService{
         this.userModel = UserModel;
     }
 
+
+     public async getCustomers(): Promise<User[]>{
+        const result = await this.userModel
+        .find({userType: UserType.CUSTOMER})
+        .lean()
+        .exec()
+        if(!result || result.length === 0) throw new Errors(HttpCode.BAD_REQUEST, Message.NO_DATA_FOUND);
+        return result as User[];
+    }
+
     public async processSignup(input: UserInput): Promise<User> {
     const exist = await this.userModel
       .findOne({ userNick: input.userNick })
