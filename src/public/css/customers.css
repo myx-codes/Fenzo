@@ -1,0 +1,73 @@
+/* --- CUSTOMERS PAGE STYLES --- */
+
+/* 1. Jadval (Table) dizayni */
+.custom-table td {
+    vertical-align: middle;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-size: 14px;
+    color: #4b5563; /* Kulrang matn */
+}
+
+.custom-table th {
+    font-weight: 600;
+    color: #64748b;
+}
+
+/* 2. Avatar (Rasm yoki Harf) */
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0; /* Ezilib qolmasligi uchun */
+    text-transform: uppercase;
+}
+
+.avatar-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 3. Status Select (Dropdown) */
+.status-select {
+    width: 110px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 20px; /* Yumaloq chetlar */
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-align: center;
+    text-align-last: center; /* Textni o'rtaga olish */
+    box-shadow: none !important;
+    appearance: none; /* Standart strelkani o'chirish (ba'zi browserlarda) */
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.status-select:hover {
+    filter: brightness(0.95);
+}
+
+
+/* 4. Filter Panel inputlari */
+.input-group-text, 
+.form-control, 
+.form-select {
+    border-color: #e2e8f0;
+}
+
+.form-control:focus, 
+.form-select:focus {
+    border-color: #cbd5e1;
+    box-shadow: none;
+    background-color: #fff !important;
+}
+
+

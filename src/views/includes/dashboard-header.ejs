@@ -1,0 +1,61 @@
+<link rel="stylesheet" href="/css/dashboard-header.css">
+
+<div class="dash-header-wrapper mb-4">
+
+    <div class="dash-tabs mb-4">
+        <a href="/seller/dashboard" class="dash-tab-link <%= activeTab === 'overview' ? 'active' : '' %>">
+            Overview
+        </a>
+        <a href="/seller/customers" class="dash-tab-link <%= activeTab === 'customers' ? 'active' : '' %>">
+            Customers
+        </a>
+        <a href="/seller/products" class="dash-tab-link <%= activeTab === 'products' ? 'active' : '' %>">
+            Products
+        </a>
+        <a href="/seller/orders" class="dash-tab-link <%= activeTab === 'orders' ? 'active' : '' %>">
+            Orders
+        </a>
+    </div>
+
+    <div class="dash-header-container">
+        
+        <div class="header-left">
+            <% if (typeof pageTitle !== 'undefined') { %>
+                <h2 class="header-title"><%= pageTitle %></h2>
+            <% } %>
+            <% if (typeof pageSubtitle !== 'undefined') { %>
+                <p class="header-subtitle"><%= pageSubtitle %></p>
+            <% } %>
+        </div>
+
+        <div class="header-right">
+            
+            <% if (typeof showAddButton !== 'undefined' && showAddButton) { %>
+                <a href="/seller/add-product" class="btn-action">
+                    <i class="fa-solid fa-plus me-2"></i> Add Product
+                </a>
+            <% } %>
+
+            <div class="profile-card">
+                <div class="profile-avatar">
+                    <% if (user && user.userImage) { %>
+                        <img src="<%= user.userImage %>" alt="<%= user.userNick %>">
+                    <% } else { %>
+                        <span><%= user.userNick ? user.userNick.charAt(0).toUpperCase() : 'U' %></span>
+                    <% } %>
+                </div>
+                
+                <div class="profile-info">
+                    <span class="profile-name"><%= user.userNick %></span>
+                    <span class="profile-role">Seller Account</span>
+                </div>
+            </div>
+
+            <a href="/seller/logout" class="btn-logout" title="Chiqish">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </a>
+
+        </div>
+    </div>
+
+</div>

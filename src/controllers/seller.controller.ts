@@ -51,7 +51,7 @@ sellerController.goDashboard = (req: SellerRequest, res: Response) => {
             return res.redirect("/seller/login"); 
         }
         res.render("dashboard", { 
-            user: req.session.user  
+            user: req.session.user
         });
 
     } catch (err) {
@@ -112,7 +112,19 @@ sellerController.processLogin = async ( req: SellerRequest, res: Response) => {
         if(err instanceof Errors)res.status(err.code).json(err);
         else res.status(Errors.standard.code).json(Errors.standard);
     }
-}
+};
+
+sellerController.logout = async (req: SellerRequest, res: Response) => {
+  try {
+    console.log("[Seller] logout");
+    req.session.destroy(function () {
+      res.redirect("/seller");
+    });
+  } catch (err) {
+    console.error("Error, logout:", err);
+    res.redirect("/seller");
+  }
+};
 
 
 

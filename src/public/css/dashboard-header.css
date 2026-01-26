@@ -1,0 +1,159 @@
+/* --- 1. TABS (Menyular) --- */
+.dash-tabs {
+    display: flex;
+    gap: 20px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 0;
+}
+
+.dash-tab-link {
+    text-decoration: none;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 14px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.dash-tab-link:hover {
+    color: #1e293b;
+}
+
+.dash-tab-link.active {
+    color: #000;
+    border-bottom-color: #000;
+}
+
+/* --- 2. HEADER CONTAINER --- */
+.dash-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end; /* Title va tugmalar bir chiziqda turishi uchun */
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* Left Side (Title) */
+.header-title {
+    font-weight: 800;
+    margin-bottom: 2px;
+    font-size: 28px;
+    color: #1e293b;
+}
+
+.header-subtitle {
+    color: #64748b;
+    margin-bottom: 0;
+    font-size: 14px;
+}
+
+/* Right Side (Actions) */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* --- 3. ACTION BUTTON (Add Product) --- */
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    padding: 0 20px;
+    background-color: #fff;
+    border: 1px solid #000;
+    color: #000;
+    font-weight: 600;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.btn-action:hover {
+    background-color: #000;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* --- 4. PROFILE CARD --- */
+.profile-card {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #e2e8f0;
+    padding: 5px;
+    padding-right: 20px;
+    border-radius: 50px; /* Pill shape */
+    height: 50px;
+    transition: box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.profile-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    font-weight: bold;
+    color: #475569;
+    border: 1px solid #f1f5f9;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.1;
+}
+
+.profile-name {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 14px;
+}
+
+.profile-role {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #94a3b8;
+    letter-spacing: 0.5px;
+}
+
+/* --- 5. LOGOUT BUTTON --- */
+.btn-logout {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 50%;
+    color: #dc2626;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-logout:hover {
+    background-color: #fee2e2;
+    border-color: #fee2e2;
+    transform: rotate(90deg);
+}

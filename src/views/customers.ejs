@@ -1,110 +1,151 @@
 <%- include('includes/header') %>
 
+<link rel="stylesheet" href="/css/dashboard.css">
 <link rel="stylesheet" href="/css/customers.css">
 
 <div class="container py-5">
 
-    <!-- PAGE HEADER -->
-    <div class="d-flex justify-content-between align-items-end mb-4">
-        <div>
-            <h1 class="page-title">Customers</h1>
-            <p class="page-subtitle mb-0">
-                View and manage customers who purchased your products
-            </p>
-        </div>
+    <%- include('includes/dashboard-header', {
+        activeTab: 'customers',
+        <!-- pageTitle: 'Customers', -->
+        <!-- pageSubtitle: 'Manage your customer base', -->
+        user: user 
+    }) %>
 
-        <div class="d-flex gap-2">
-            <input 
-                type="text" 
-                class="form-control search-input"
-                placeholder="Search customer..."
-            >
+    <div class="panel mb-4 p-3">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0">
+                        <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                    </span>
+                    <input type="text" class="form-control bg-light border-start-0" placeholder="Search by name, email...">
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <select class="form-select bg-light">
+                    <option value="">All Statuses</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="BLOCK">Blocked</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <input type="date" class="form-control bg-light">
+            </div>
+
+            <div class="col-md-2 text-end">
+                <button class="btn btn-outline-dark w-100 fw-bold">Filter</button>
+            </div>
         </div>
     </div>
 
-    <!-- CUSTOMERS TABLE -->
-    <div class="panel p-0">
-        <table class="table customers-table mb-0">
-            <thead>
-                <tr>
-                    <th>Customer</th>
-                    <th>Email</th>
-                    <th>Total Orders</th>
-                    <th>Total Spent</th>
-                    <th>Last Order</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
+    <div class="panel p-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 custom-table">
+                <thead class="bg-light border-bottom">
+                    <tr>
+                        <th class="py-3 ps-4 text-uppercase" style="font-size:11px; letter-spacing:0.5px;">Customer</th>
+                        <th class="py-3 text-uppercase" style="font-size:11px; letter-spacing:0.5px;">Contact Info</th>
+                        <th class="py-3 text-uppercase" style="font-size:11px; letter-spacing:0.5px;">Orders / Spent</th>
+                        <th class="py-3 text-uppercase" style="font-size:11px; letter-spacing:0.5px;">Joined Date</th>
+                        <th class="py-3 text-center text-uppercase" style="font-size:11px; letter-spacing:0.5px;">Status</th>
+                    </tr>
+                </thead>
 
-                <tr>
-                    <td>
-                        <div class="customer-info">
-                            <div class="customer-avatar">A</div>
-                            <span>Ali Karimov</span>
-                        </div>
-                    </td>
-                    <td>ali@gmail.com</td>
-                    <td>8</td>
-                    <td>$1,240</td>
-                    <td>2 days ago</td>
-                    <td>
-                        <span class="status-badge active">Active</span>
-                    </td>
-                </tr>
+                <tbody>
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle bg-primary-subtle text-primary me-3">A</div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold text-dark">Ali Karimov</h6>
+                                    <small class="text-muted">ID: #CUS-8821</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <span class="fw-medium text-dark">ali@gmail.com</span>
+                                <span class="text-muted small">+998 90 123 45 67</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold text-dark">8 Orders</span>
+                                <span class="text-success small fw-bold">$1,240.00</span>
+                            </div>
+                        </td>
+                        <td><span class="text-muted small">Oct 24, 2024</span></td>
+                        <td class="text-center">
+                            <select class="status-select status-active form-select form-select-sm" onchange="updateStatusColor(this)">
+                                <option value="ACTIVE" selected>ACTIVE</option>
+                                <option value="BLOCK">BLOCK</option>
+                                <option value="DELETE">DELETE</option>
+                            </select>
+                        </td>
+                    </tr>
 
-                <tr>
-                    <td>
-                        <div class="customer-info">
-                            <div class="customer-avatar">S</div>
-                            <span>Sara Lee</span>
-                        </div>
-                    </td>
-                    <td>sara@email.com</td>
-                    <td>3</td>
-                    <td>$520</td>
-                    <td>1 week ago</td>
-                    <td>
-                        <span class="status-badge active">Active</span>
-                    </td>
-                </tr>
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle bg-warning-subtle text-warning me-3">S</div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold text-dark">Sara Lee</h6>
+                                    <small class="text-muted">ID: #CUS-9912</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <span class="fw-medium text-dark">sara@email.com</span>
+                                <span class="text-muted small">+998 93 444 22 11</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold text-dark">3 Orders</span>
+                                <span class="text-success small fw-bold">$520.00</span>
+                            </div>
+                        </td>
+                        <td><span class="text-muted small">Dec 01, 2024</span></td>
+                        <td class="text-center">
+                            <select class="status-select status-block form-select form-select-sm" onchange="updateStatusColor(this)">
+                                <option value="ACTIVE">ACTIVE</option>
+                                <option value="BLOCK" selected>BLOCK</option>
+                                <option value="DELETE">DELETE</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-                <tr>
-                    <td>
-                        <div class="customer-info">
-                            <div class="customer-avatar muted">J</div>
-                            <span>John Smith</span>
-                        </div>
-                    </td>
-                    <td>john@demo.com</td>
-                    <td>1</td>
-                    <td>$199</td>
-                    <td>1 month ago</td>
-                    <td>
-                        <span class="status-badge inactive">Inactive</span>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>
-                        <div class="customer-info">
-                            <div class="customer-avatar">M</div>
-                            <span>Maria Gomez</span>
-                        </div>
-                    </td>
-                    <td>maria@mail.com</td>
-                    <td>5</td>
-                    <td>$870</td>
-                    <td>3 days ago</td>
-                    <td>
-                        <span class="status-badge active">Active</span>
-                    </td>
-                </tr>
-
-            </tbody>
-        </table>
+          <div class="position-relative d-flex justify-content-center align-items-center p-3 border-top bg-light"> 
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item disabled"><a class="page-link border-0 bg-transparent" href="#"><i class="fa-solid fa-chevron-left"></i></a></li>
+                    <li class="page-item active"><a class="page-link border rounded-2 bg-white text-dark shadow-sm fw-bold mx-1" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link border-0 bg-transparent text-muted" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link border-0 bg-transparent" href="#"><i class="fa-solid fa-chevron-right"></i></a></li>
+                </ul>
+            </nav>
+        </div>
     </div>
-
 </div>
+
+<script>
+    function updateStatusColor(selectElement) {
+        // Hamma rang klasslarini olib tashlash
+        selectElement.classList.remove('status-active', 'status-block', 'status-delete');
+        
+        // Yangi rang klassini qo'shish
+        const val = selectElement.value;
+        if (val === 'ACTIVE') selectElement.classList.add('status-active');
+        else if (val === 'BLOCK') selectElement.classList.add('status-block');
+        else if (val === 'DELETE') selectElement.classList.add('status-delete');
+    }
+</script>
 
 <%- include('includes/footer') %>

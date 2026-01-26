@@ -1,0 +1,224 @@
+<%- include('includes/header') %>
+<link rel="stylesheet" href="/css/dashboard.css">
+
+<div class="container py-5">
+
+     <!-- DASHBOARD HEADER (tabs + profile + actions) -->
+    <%- include('includes/dashboard-header', {
+    activeTab: 'orders',
+    pageTitle: 'Orders',
+    pageSubtitle: 'Track and manage orders',
+    user: user
+}) %>
+
+    <!-- <div class="d-flex flex-wrap justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-bold mb-1">Orders Management</h2>
+            <p class="text-muted mb-0">Track and update your order statuses</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-3 bg-white p-1 pe-4 rounded-pill border shadow-sm" style="height: 50px;">
+                <div class="profile-avatar">
+                    <% if (member && member.userImage) { %>
+                        <img src="<%= member.userImage %>" alt="<%= member.userNick %>">
+                    <% } else { %>
+                        <span><%= member.userNick.charAt(0).toUpperCase() %></span>
+                    <% } %>
+                </div>
+                <div class="d-flex flex-column justify-content-center" style="line-height: 1.1;">
+                    <span class="fw-bold text-dark" style="font-size: 14px;"><%= member.userNick %></span>
+                    <span class="text-muted" style="font-size: 10px; text-transform: uppercase;">Seller</span>
+                </div>
+            </div>
+
+            <a href="/seller/logout" class="btn btn-light border shadow-sm d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                <i class="fa-solid fa-arrow-right-from-bracket text-danger"></i>
+            </a>
+        </div>
+    </div> -->
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="panel p-3 d-flex align-items-center justify-content-between bg-white shadow-sm border">
+                <div>
+                    <span class="text-muted small text-uppercase fw-bold">Pending</span>
+                    <h4 class="mb-0 mt-1">12</h4>
+                </div>
+                <div class="rounded-circle bg-warning-subtle text-warning p-3">
+                    <i class="fa-regular fa-clock fa-lg"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel p-3 d-flex align-items-center justify-content-between bg-white shadow-sm border">
+                <div>
+                    <span class="text-muted small text-uppercase fw-bold">Processing</span>
+                    <h4 class="mb-0 mt-1">5</h4>
+                </div>
+                <div class="rounded-circle bg-primary-subtle text-primary p-3">
+                    <i class="fa-solid fa-spinner fa-lg"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel p-3 d-flex align-items-center justify-content-between bg-white shadow-sm border">
+                <div>
+                    <span class="text-muted small text-uppercase fw-bold">Delivered</span>
+                    <h4 class="mb-0 mt-1">145</h4>
+                </div>
+                <div class="rounded-circle bg-success-subtle text-success p-3">
+                    <i class="fa-solid fa-check-double fa-lg"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel p-3 d-flex align-items-center justify-content-between bg-white shadow-sm border">
+                <div>
+                    <span class="text-muted small text-uppercase fw-bold">Total Sales</span>
+                    <h4 class="mb-0 mt-1">$12,450</h4>
+                </div>
+                <div class="rounded-circle bg-dark-subtle text-dark p-3">
+                    <i class="fa-solid fa-dollar-sign fa-lg"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel p-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 custom-table">
+                <thead class="bg-light border-bottom">
+                    <tr>
+                        <th class="py-3 ps-4 text-muted text-uppercase small">Order ID</th>
+                        <th class="py-3 text-muted text-uppercase small">Customer</th>
+                        <th class="py-3 text-muted text-uppercase small">Total</th>
+                        <th class="py-3 text-muted text-uppercase small">Date</th>
+                        <th class="py-3 text-center text-muted text-uppercase small">Status</th>
+                        <th class="py-3 text-end pe-4 text-muted text-uppercase small">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td class="ps-4 fw-bold">#ORD-7721</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-small me-2 bg-light rounded-circle text-center pt-1" style="width:30px; height:30px;">A</div>
+                                <span>Ali Karimov</span>
+                            </div>
+                        </td>
+                        <td class="fw-bold">$120.50</td>
+                        <td class="text-muted small">2 mins ago</td>
+                        <td class="text-center">
+                            <select class="order-status form-select form-select-sm status-PENDING" onchange="changeOrderStatus(this)">
+                                <option value="PENDING" selected>PENDING</option>
+                                <option value="PAID">PAID</option>
+                                <option value="PROCESSING">PROCESSING</option>
+                                <option value="SHIPPED">SHIPPED</option>
+                                <option value="DELIVERED">DELIVERED</option>
+                                <option value="CANCELLED">CANCELLED</option>
+                            </select>
+                        </td>
+                        <td class="text-end pe-4">
+                            <button class="btn btn-sm btn-light border"><i class="fa-solid fa-eye"></i></button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="ps-4 fw-bold">#ORD-7720</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-small me-2 bg-light rounded-circle text-center pt-1" style="width:30px; height:30px;">J</div>
+                                <span>John Doe</span>
+                            </div>
+                        </td>
+                        <td class="fw-bold">$1,299.00</td>
+                        <td class="text-muted small">1 hour ago</td>
+                        <td class="text-center">
+                            <select class="order-status form-select form-select-sm status-PAID" onchange="changeOrderStatus(this)">
+                                <option value="PENDING">PENDING</option>
+                                <option value="PAID" selected>PAID</option>
+                                <option value="PROCESSING">PROCESSING</option>
+                                <option value="SHIPPED">SHIPPED</option>
+                                <option value="DELIVERED">DELIVERED</option>
+                                <option value="CANCELLED">CANCELLED</option>
+                            </select>
+                        </td>
+                        <td class="text-end pe-4">
+                            <button class="btn btn-sm btn-light border"><i class="fa-solid fa-eye"></i></button>
+                        </td>
+                    </tr>
+
+                     <tr>
+                        <td class="ps-4 fw-bold">#ORD-7719</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-small me-2 bg-light rounded-circle text-center pt-1" style="width:30px; height:30px;">M</div>
+                                <span>Malika</span>
+                            </div>
+                        </td>
+                        <td class="fw-bold">$45.00</td>
+                        <td class="text-muted small">3 hours ago</td>
+                        <td class="text-center">
+                            <select class="order-status form-select form-select-sm status-PROCESSING" onchange="changeOrderStatus(this)">
+                                <option value="PENDING">PENDING</option>
+                                <option value="PAID">PAID</option>
+                                <option value="PROCESSING" selected>PROCESSING</option>
+                                <option value="SHIPPED">SHIPPED</option>
+                                <option value="DELIVERED">DELIVERED</option>
+                                <option value="CANCELLED">CANCELLED</option>
+                            </select>
+                        </td>
+                        <td class="text-end pe-4">
+                            <button class="btn btn-sm btn-light border"><i class="fa-solid fa-eye"></i></button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="ps-4 fw-bold">#ORD-7715</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-small me-2 bg-light rounded-circle text-center pt-1" style="width:30px; height:30px;">B</div>
+                                <span>Bobur</span>
+                            </div>
+                        </td>
+                        <td class="fw-bold">$210.00</td>
+                        <td class="text-muted small">Yesterday</td>
+                        <td class="text-center">
+                            <select class="order-status form-select form-select-sm status-DELIVERED" onchange="changeOrderStatus(this)">
+                                <option value="PENDING">PENDING</option>
+                                <option value="SHIPPED">SHIPPED</option>
+                                <option value="DELIVERED" selected>DELIVERED</option>
+                                <option value="CANCELLED">CANCELLED</option>
+                            </select>
+                        </td>
+                        <td class="text-end pe-4">
+                            <button class="btn btn-sm btn-light border"><i class="fa-solid fa-eye"></i></button>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function changeOrderStatus(select) {
+        // Avvalgi barcha rang klasslarini olib tashlaymiz
+        select.classList.remove(
+            'status-PENDING', 'status-PAID', 'status-PROCESSING', 
+            'status-SHIPPED', 'status-DELIVERED', 'status-CANCELLED', 'status-REFUNDED'
+        );
+        
+        // Yangi tanlangan status klassini qo'shamiz
+        const newStatus = select.value;
+        select.classList.add('status-' + newStatus);
+        
+        // Bu yerda keyinchalik AXIOS request yuboriladi
+        console.log(`Order updated to: ${newStatus}`);
+    }
+</script>
+
+<%- include('includes/footer') %>

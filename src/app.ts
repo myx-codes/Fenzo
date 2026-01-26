@@ -7,6 +7,12 @@ import { MORGAN_FORMAT } from './libs/config';
 import session from 'express-session';
 import ConnectMongoDB from "connect-mongodb-session"
 
+declare module 'express-session' {
+  interface SessionData {
+    user?: any;
+  }
+}
+
 const MongoDBStore = ConnectMongoDB(session);
 const store = new MongoDBStore({
     uri: String(process.env.MONGO_URL),
@@ -32,6 +38,12 @@ app.use(
   saveUninitialized: true
 })
 );
+
+app.use((req, res, next) => {
+    res.locals.user = req.session.user;
+    next();
+});
+
 
 
 
