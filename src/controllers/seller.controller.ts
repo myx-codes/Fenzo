@@ -107,6 +107,7 @@ sellerController.processLogin = async ( req: SellerRequest, res: Response) => {
         req.session.save(function(){
         res.redirect("/seller/dashboard")
         });
+        console.log(`Seller: ${req.session.user.userNick}, Id: ${req.session.user._id}`)
     }catch(err){
         console.log("Error processLoin")
         if(err instanceof Errors)res.status(err.code).json(err);
@@ -126,6 +127,15 @@ sellerController.logout = async (req: SellerRequest, res: Response) => {
   }
 };
 
-
+sellerController.checkAuthSession = async (req: SellerRequest, res: Response) => {
+    try{
+        console.log("checkAuthSession");
+        if(req.session?.user)res.send(`<script> alert("${req.session.user.userNick}")</script>`);
+        else res.send(`<script> alert("${Message.NOT_AUTHENTICATED}")</script>`)
+    }catch(err){
+        console.log("Error, checkAuthSession", err);
+        res.send(err);
+    }
+};
 
 export default sellerController;

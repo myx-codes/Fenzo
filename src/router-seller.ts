@@ -11,11 +11,14 @@ routerSeller
 
 routerSeller
 .post("/signup", sellerController.processSignup)
-.post("/login", sellerController.processLogin);
+.post("/login", sellerController.processLogin)
 
 routerSeller
 .get("/dashboard", sellerController.goDashboard)
 .get("/customers", sellerController.getCustomers)
 .get("/logout", sellerController.logout);
+
+routerSeller
+.get("/check-me", sellerController.checkAuthSession)
 
 export default routerSeller;
