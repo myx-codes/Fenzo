@@ -22,13 +22,7 @@ const store = new MongoDBStore({
 // Enterance
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
-const uploadsPath = path.join(__dirname, "../uploads");
-
-// 2. Tekshirish uchun logga chiqaramiz (Terminalda ko'rinadi)
-console.log("📂 Rasm yuklash papkasi manzili:", uploadsPath);
-
-// 3. Statik yo'lni ochamiz
-app.use("/uploads", express.static(uploadsPath));
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan(MORGAN_FORMAT))

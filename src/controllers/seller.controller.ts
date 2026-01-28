@@ -103,7 +103,7 @@ sellerController.processSignup = async (req: SellerRequest, res: Response) => {
     catch(err){
         console.log("Error, processSignup:", err);
         const message = err instanceof Errors ? err.message: Message.SOMETHING_WENT_WRONG;
-        res.send(`<script>alert("${message}"); window.location.replace('seller/signup')</script>`)
+        res.send(`<script>alert("${message}"); window.location.replace('/seller/signup')</script>`)
     }
 };
 
