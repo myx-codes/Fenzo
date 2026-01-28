@@ -1,31 +1,43 @@
 import { ObjectId } from "mongoose";
-import { ProductCollection, ProductStatus, ProductType } from "../enums/product.enums";
+import { 
+    ProductStatus, 
+    ProductCollection, 
+    ProductType, 
+    ProductGender, 
+    ProductUnit 
+} from "../enums/product.enums";
 
 export interface Product {
     _id: ObjectId;
     productStatus: ProductStatus;
-    productCollection: ProductCollection;
     productType: ProductType;
+    productCollection: ProductCollection;
     productName: string;
+    productDesc: string;
     productPrice: number;
-    productLeftCount: number;
-    productSold: number;
-    productDesc?: string;
+    productDiscountPrice: number; // Yangi qo'shildi
+    productStock: number;         // productLeftCount o'rniga
+    productUnit: ProductUnit;
+    productGender: ProductGender;
     productImages: string[];
     productViews: number;
-    productRating: number;
+    productLikes: number;
+    productRating: number;        // Yangi qo'shildi
     createdAt: Date;
     updatedAt: Date;
 }
 
 export interface ProductInput {
     productStatus?: ProductStatus;
+    productType?: ProductType;
     productCollection: ProductCollection;
-    productType: ProductType;
     productName: string;
+    productDesc: string;
     productPrice: number;
-    productLeftCount: number;
-    productDesc?: string;
+    productDiscountPrice?: number;
+    productStock: number;
+    productUnit?: ProductUnit;
+    productGender?: ProductGender;
     productImages?: string[];
 }
 

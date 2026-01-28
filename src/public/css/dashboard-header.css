@@ -128,6 +128,7 @@
     font-weight: 700;
     color: #1e293b;
     font-size: 14px;
+    margin: 5px;
 }
 
 .profile-role {
@@ -156,4 +157,11 @@
     background-color: #fee2e2;
     border-color: #fee2e2;
     transform: rotate(90deg);
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Rasmni doira ichiga sig'diradi */
+    border-radius: 50%;
 }

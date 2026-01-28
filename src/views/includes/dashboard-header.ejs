@@ -37,9 +37,10 @@
             <% } %>
 
             <div class="profile-card">
+                
                 <div class="profile-avatar">
                     <% if (user && user.userImage) { %>
-                        <img src="<%= user.userImage %>" alt="<%= user.userNick %>">
+                        <img src="/<%= user.userImage.trim() %>" alt="<%= user.userNick %>">
                     <% } else { %>
                         <span><%= user.userNick ? user.userNick.charAt(0).toUpperCase() : 'U' %></span>
                     <% } %>

@@ -1,6 +1,6 @@
 import { Errors, HttpCode, Message } from "../libs/Errors";
 import { T } from "../libs/types/common";
-import { Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 import { LoginInput, UserInput } from "../libs/types/user";
 import { UserType } from "../libs/enums/user.enums";
 import SellerService from "../models/Seller.service";
@@ -47,6 +47,7 @@ sellerController.getLogin = (req: Request, res: Response) => {
 sellerController.goDashboard = (req: SellerRequest, res: Response) => {
     try {
         console.log("Seller, goDashboard");
+        console.log("DASHBOARD SESSION USER:", req.session.user);
         if (!req.session?.user) {
             return res.redirect("/seller/login"); 
         }
@@ -77,21 +78,32 @@ sellerController.getCustomers = async (req: Request, res: Response) => {
 
 sellerController.processSignup = async (req: SellerRequest, res: Response) => {
     try{
-        console.log("processSignup");
-        console.log("body", req.body);
+        console.log("processSignup ishladi!");
+        console.log("Body:", req.body);
+        console.log("FILE:", req.file);
+
+        const files = req.file;
+        if(!files)
+            throw new Errors(HttpCode.BAD_REQUEST, Message.SOMETHING_WENT_WRONG);
+
         const newUser: UserInput = req.body;
+        newUser.userImage = files?.path.replace(/\\/g, "/");
         newUser.userType = UserType.SELLER;
+        newUser.userImage = req.file?.path;
+        console.log("SIGNUP INPUT:", newUser);
+
         const result = await sellerService.processSignup(newUser);
 
         //SESSION AUTHENTICATION
         req.session.user = result;
         req.session.save(function(){
-        res.send(result)
+        res.redirect("/seller/dashboard")
         });
     }
     catch(err){
         console.log("Error, processSignup:", err);
-        res.send(err);
+        const message = err instanceof Errors ? err.message: Message.SOMETHING_WENT_WRONG;
+        res.send(`<script>alert("${message}"); window.location.replace('seller/signup')</script>`)
     }
 };
 
@@ -99,11 +111,19 @@ sellerController.processSignup = async (req: SellerRequest, res: Response) => {
 sellerController.processLogin = async ( req: SellerRequest, res: Response) => {
     try{
         console.log("processLogin")
+        console.log("Body", req.body)
         const input: LoginInput = req.body;
         const result = await sellerService.processLogin(input)
 
+        if (result.userType !== UserType.SELLER) {
+            console.log("You are not Authiration user")
+            throw new Errors(HttpCode.FORBIDDEN, Message.NOT_ALLOWED)
+        }
+
         //SESSION AUTHENTICATION
+        console.log("LOGIN RESULT:", result);
         req.session.user = result;
+        console.log("SESSION USER AFTER SAVE:", req.session.user);
         req.session.save(function(){
         res.redirect("/seller/dashboard")
         });
@@ -137,5 +157,17 @@ sellerController.checkAuthSession = async (req: SellerRequest, res: Response) =>
         res.send(err);
     }
 };
+
+
+sellerController.verifySeller = (
+    req: SellerRequest, 
+    res: Response, 
+    next: NextFunction) => {
+        if(req.session?.user?.userType === UserType.SELLER){
+            req.user = req.session.user;
+            return next();
+        }else 
+            return res.status(401).send(`<script> alert("${Message.NOT_AUTHENTICATED}"); window.location.replace('/seller/login')</script>`)
+    }
 
 export default sellerController;

@@ -1,64 +1,75 @@
 console.log("Signup frontend javascript file");
 
-$(function(){
+$(function () {
+    // 1. Rasm yuklash va Preview (Oldindan ko'rish) qismi
     const fileTarget = $(".file-box .upload-hidden");
     let filename;
 
-    fileTarget.on("change", function(){
+    fileTarget.on("change", function () {
         if (window.FileReader) {
-            if (!this.files || this.files.length === 0) return;
-
             const uploadFile = $(this)[0].files[0];
+            
+            // Agar rasm tanlanmagan bo'lsa, to'xtaymiz
+            if (!uploadFile) return;
+
             const fileType = uploadFile["type"];
             const validImageType = ["image/jpeg", "image/png", "image/jpg", "image/avif", "image/webp"];
 
+            // Formatni tekshirish
             if (!validImageType.includes(fileType)) {
-                alert("Please insert only jpeg, jpg, avif, webp and png");
-                filename = undefined;
+                alert("Iltimos, faqat jpeg, jpg, avif, webp va png formatidagi rasmlarni yuklang!");
+                $(this).val(""); // Inputni tozalab tashlaymiz
             } else {
+                // Rasmni ekranda ko'rsatish (Preview)
                 if (uploadFile) {
                     $(".upload-img-frame")
                         .attr("src", URL.createObjectURL(uploadFile))
                         .addClass("success");
                 }
-                filename = $(this)[0].files[0].name;
+                // Fayl nomini olish
+                filename = uploadFile.name;
             }
 
+            // Fayl nomini input yoniga yozish
             $(this).siblings(".upload-name").val(filename);
         }
     });
 });
 
-function validateSignupForm(){
-    const memberNick = $(".member-nick").val();
-    const memberPhone = $(".member-phone").val();
-    const memberPassword = $(".member-password").val();
+// 2. Formani yuborishdan oldin tekshirish (Validation)
+function validateSignupForm() {
+    // Fenzo loyihasiga moslab klasslarni o'zgartirdik (.user-...)
+    const userNick = $(".user-nick").val();
+    const userPhone = $(".user-phone").val();
+    const userPassword = $(".user-password").val();
     const confirmPassword = $(".confirm-password").val();
 
+    // 1-Tekshiruv: Bo'sh joylar
     if (
-        memberNick === "" ||
-        memberPhone === "" ||
-        memberPassword === "" ||
+        userNick === "" ||
+        userPhone === "" ||
+        userPassword === "" ||
         confirmPassword === ""
     ) {
-        alert("Please insert all required inputs");
+        alert("Iltimos, barcha maydonlarni to'ldiring!");
         return false;
     }
 
-    if (memberPassword !== confirmPassword) {
-        console.log(memberPassword, confirmPassword);
-        alert("password differs, please check");
+    // 2-Tekshiruv: Parollar mosligi
+    if (userPassword !== confirmPassword) {
+        alert("Parollar mos kelmadi, iltimos qayta tekshiring!");
         return false;
     }
 
-    const memberImage = $(".member-image").get(0).files[0]
-        ? $(".member-image").get(0).files[0].name
-        : null;
+    // 3-Tekshiruv: Rasm yuklanganligi
+    // .user-image klassi orqali faylni topamiz
+    const userImage = $(".user-image").get(0).files[0];
 
-    if (!memberImage) {
-        alert("please insert restuarnt image");
+    if (!userImage) {
+        alert("Iltimos, rasmingizni yuklang!");
         return false;
     }
 
+    // Hammasi joyida bo'lsa
     return true;
 }

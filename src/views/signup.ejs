@@ -13,13 +13,33 @@
                             <p class="text-muted">Enter your details to create an account</p>
                         </div>
 
-                        <form action="/seller/signup" method="POST">
+                        <form action="/seller/signup" method="POST" enctype="multipart/form-data" onsubmit="return validateSignupForm()">
                             
+                            <div class="mb-4 file-box">
+                                <div class="text-center mb-3">
+                                    <img src="/img/default-user.png" class="upload-img-frame rounded-circle shadow-sm border" 
+                                        style="width: 100px; height: 100px; object-fit: cover;" alt="avatar">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Upload Image</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-image text-muted"></i></span>
+                                        
+                                        <input type="file" name="userImage" class="form-control bg-light border-start-0 upload-hidden user-image" required>
+                                    </div>
+                                    
+                                    <input type="text" class="upload-name d-none">
+                                </div>
+
+                            </div>
+                            
+
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Username</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user text-muted"></i></span>
-                                    <input type="text" name="memberNick" class="form-control bg-light border-start-0" placeholder="Steven" required>
+                                    <input type="text" name="userNick" class="form-control bg-light border-start-0 user-nick" placeholder="Steven" required>
                                 </div>
                             </div>
 
@@ -27,7 +47,7 @@
                                 <label class="form-label fw-bold">Phone Number</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-phone text-muted"></i></span>
-                                    <input type="text" name="memberPhone" class="form-control bg-light border-start-0" placeholder="+998 90 123 45 67" required>
+                                    <input type="text" name="userPhone" class="form-control bg-light border-start-0 user-phone" placeholder="+998 90 123 45 67" required>
                                 </div>
                             </div>
 
@@ -35,7 +55,7 @@
                                 <label class="form-label fw-bold">Password</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
-                                    <input type="password" name="memberPassword" class="form-control bg-light border-start-0" placeholder="********" required>
+                                    <input type="password" name="userPassword" class="form-control bg-light border-start-0 user-password" placeholder="********" required>
                                 </div>
                             </div>
 
@@ -43,7 +63,7 @@
                                 <label class="form-label fw-bold">Confirm Password</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-key text-muted"></i></span>
-                                    <input type="password" name="confirm_password" class="form-control bg-light border-start-0" placeholder="********" required>
+                                    <input type="password" name="confirm_password" class="form-control bg-light border-start-0 confirm-password" placeholder="********" required>
                                 </div>
                             </div>
 
@@ -63,5 +83,61 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(function () {
+        const fileTarget = $(".file-box .upload-hidden");
+        let filename;
+
+        fileTarget.on("change", function () {
+            if (window.FileReader) {
+                const uploadFile = $(this)[0].files[0];
+                if (!uploadFile) return;
+
+                const fileType = uploadFile["type"];
+                const validImageType = ["image/jpeg", "image/png", "image/jpg", "image/avif", "image/webp"];
+
+                if (!validImageType.includes(fileType)) {
+                    alert("Iltimos, faqat jpeg, jpg, avif, webp va png formatidagi rasmlarni yuklang!");
+                    $(this).val(""); 
+                } else {
+                    if (uploadFile) {
+                        // Rasmni PREVIEW qilish qismi
+                        $(".upload-img-frame")
+                            .attr("src", URL.createObjectURL(uploadFile))
+                            .addClass("success");
+                    }
+                    filename = uploadFile.name;
+                }
+                $(this).siblings(".upload-name").val(filename);
+            }
+        });
+    });
+
+    function validateSignupForm() {
+        const userNick = $(".user-nick").val();
+        const userPhone = $(".user-phone").val();
+        const userPassword = $(".user-password").val();
+        const confirmPassword = $(".confirm-password").val();
+
+        if (userNick === "" || userPhone === "" || userPassword === "" || confirmPassword === "") {
+            alert("Iltimos, barcha maydonlarni to'ldiring!");
+            return false;
+        }
+
+        if (userPassword !== confirmPassword) {
+            alert("Parollar mos kelmadi, iltimos qayta tekshiring!");
+            return false;
+        }
+
+        const userImage = $(".user-image").get(0).files[0];
+        if (!userImage) {
+            alert("Iltimos, rasmingizni yuklang!");
+            return false;
+        }
+
+        return true;
+    }
+</script>
 
 <%- include('includes/footer') %>

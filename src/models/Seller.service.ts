@@ -48,6 +48,7 @@ class SellerService{
         {userNick: input.userNick},
         {userNick:1, userPassword:1}
     ).exec();
+    console.log("LOGIN DB SELLER:", user);
     if(!user) throw new Errors(HttpCode.NOT_FOUND, Message.NO_USER_NICK)
 
     const isMatch = await bcrypt.compare

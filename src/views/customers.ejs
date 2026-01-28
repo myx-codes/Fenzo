@@ -60,7 +60,7 @@
                             <div class="d-flex align-items-center">
                                 <div class="avatar-circle bg-primary-subtle text-primary me-3">A</div>
                                 <div>
-                                    <h6 class="mb-0 fw-bold text-dark">Ali Karimov</h6>
+                                    <h6 class="mb-0 fw-bold text-dark"><%= user.userNick %></h6>
                                     <small class="text-muted">ID: #CUS-8821</small>
                                 </div>
                             </div>
@@ -68,7 +68,7 @@
                         <td>
                             <div class="d-flex flex-column">
                                 <span class="fw-medium text-dark">ali@gmail.com</span>
-                                <span class="text-muted small">+998 90 123 45 67</span>
+                                <span class="text-muted small"><%= user.userPhone %></span>
                             </div>
                         </td>
                         <td>
@@ -85,39 +85,6 @@
                                 <option value="DELETE">DELETE</option>
                             </select>
                         </td>
-                    </tr>
-
-                    <tr>
-                        <td class="ps-4">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-circle bg-warning-subtle text-warning me-3">S</div>
-                                <div>
-                                    <h6 class="mb-0 fw-bold text-dark">Sara Lee</h6>
-                                    <small class="text-muted">ID: #CUS-9912</small>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex flex-column">
-                                <span class="fw-medium text-dark">sara@email.com</span>
-                                <span class="text-muted small">+998 93 444 22 11</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex flex-column">
-                                <span class="fw-bold text-dark">3 Orders</span>
-                                <span class="text-success small fw-bold">$520.00</span>
-                            </div>
-                        </td>
-                        <td><span class="text-muted small">Dec 01, 2024</span></td>
-                        <td class="text-center">
-                            <select class="status-select status-block form-select form-select-sm" onchange="updateStatusColor(this)">
-                                <option value="ACTIVE">ACTIVE</option>
-                                <option value="BLOCK" selected>BLOCK</option>
-                                <option value="DELETE">DELETE</option>
-                            </select>
-                        </td>
-                    </tr>
                 </tbody>
             </table>
         </div>
