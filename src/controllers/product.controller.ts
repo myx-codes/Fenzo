@@ -106,46 +106,54 @@ productController.getUpdateProduct = async (req: Request, res: Response) => {
 productController.updateChosenProduct = async (req: Request, res: Response) => {
   try {
     console.log("updateChosenProduct");
-
     const id = req.params.id;
 
-    //eski productni olib kelamiz
+    // 1. Eski productni olib kelamiz
     const oldProduct = await productService.getProductById(id);
 
-    // yangi yuklangan rasmlar (agar bo‘lsa)
-    const newImages =
-      req.files && Array.isArray(req.files)
-        ? req.files.map((file: any) => file.path)
-        : [];
+    // 2. Yangi fayllar
+    const newFiles = req.files && Array.isArray(req.files) ? req.files : [];
+    
+    // 3. Qaysi indeksdagi rasmlar o'zgarishi kerakligini olamiz
+    // Frontenddan "0,2" kabi string keladi
+    let indexes: number[] = [];
+    if (req.body.imageIndexes) {
+        indexes = req.body.imageIndexes.split(',').map((i: string) => Number(i));
+    }
 
-    // eski + yangi rasmlarni birlashtiramiz
-    const mergedImages =
-      newImages.length > 0
-        ? [...oldProduct.productImages, ...newImages]
-        : oldProduct.productImages;
+    // 4. MANTIQ: Eski rasmlardan nusxa olamiz va keraklilarini almashtiramiz
+    let finalImages = [...oldProduct.productImages];
 
-    // update uchun input tayyorlaymiz
+    // Har bir yangi faylni o'z joyiga qo'yamiz
+    newFiles.forEach((file: any, i: number) => {
+        const targetIndex = indexes[i]; // Bu fayl qaysi joyga tegishli?
+        
+        // Agar indeks to'g'ri bo'lsa va 5 ta rasm limitidan oshmasa
+        if (targetIndex >= 0 && targetIndex < 5) {
+            finalImages[targetIndex] = file.path;
+        } else {
+            // Agar indeks topilmasa (xatolik bo'lsa), shunchaki qo'shib qo'yamiz
+            finalImages.push(file.path);
+        }
+    });
+
+    // 5. Inputni tayyorlash
     const input: any = {
       productName: req.body.productName,
       productDesc: req.body.productDesc,
       productStatus: req.body.productStatus,
       productCollection: req.body.productCollection,
       productType: req.body.productType,
-      productImages: mergedImages,
+      productImages: finalImages, // O'zgargan array
     };
 
-    // number maydonlarni alohida tekshirib qo‘shamiz
-    if (req.body.productPrice !== undefined) {
-      input.productPrice = Number(req.body.productPrice);
-    }
+    // Number maydonlar
+    if (req.body.productPrice !== undefined) input.productPrice = Number(req.body.productPrice);
+    if (req.body.productStock !== undefined) input.productStock = Number(req.body.productStock);
 
-    if (req.body.productStock !== undefined) {
-      input.productStock = Number(req.body.productStock);
-    }
-    // update
+    // 6. Update
     await productService.updateChosenProduct(id, input);
 
-    console.log("Reqbody", req.body)
     res.redirect("/seller/products");
 
   } catch (err) {
@@ -154,6 +162,7 @@ productController.updateChosenProduct = async (req: Request, res: Response) => {
     else res.status(Errors.standard.code).json(Errors.standard);
   }
 };
+
 
 productController.updateProductStatus = async (req: Request, res: Response) => {
         try {

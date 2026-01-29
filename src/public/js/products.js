@@ -1,13 +1,105 @@
-$(function() {
-    // ... (eski kodlar: image preview, validation ...)
+console.log("Products Frontend JS Ready");
 
-    // 3. STATUS CHANGE HANDLER (Yangi qo'shilgan qism)
+
+$(function() {
+    let changedOrders = []; // O'zgargan rasmlar tartibini saqlaymiz
+
+    $(".image-field").on("change", function() {
+        const order = $(this).data("order"); // masalan: 1, 2, 3...
+        const file = this.files[0];
+
+        if (file) {
+            // ... (eski preview va validatsiya kodlaringiz) ...
+
+            // YANGI QISM: Tartib raqamini saqlash
+            // Array indeksi 0 dan boshlanadi, shuning uchun order-1 qilamiz
+            const index = order - 1; 
+
+            // Agar bu indeks avval qo'shilmagan bo'lsa, ro'yxatga qo'shamiz
+            if (!changedOrders.includes(index)) {
+                changedOrders.push(index);
+            }
+            
+            // Tartiblash (0, 1, 4 kabi) va inputga yozish
+            changedOrders.sort((a, b) => a - b);
+            $("#imageIndexes").val(changedOrders.join(",")); 
+            
+            console.log("Yangilanadigan indekslar:", $("#imageIndexes").val());
+        }
+    });
+});
+
+
+$(function() {
+
+    // ==================================================
+    // 1. RASM YUKLASH VA PREVIEW (Bu qism AddProduct uchun kerak)
+    // ==================================================
+    $(".image-field").on("change", function() {
+        const input = this;
+        const order = $(this).data("order"); // 1, 2, 3, 4, 5
+        const file = input.files[0];
+
+        if (file) {
+            // Fayl formati tekshiruvi
+            const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+            if (!validTypes.includes(file.type)) {
+                alert("Please upload a valid image (JPG, PNG, WEBP).");
+                $(input).val(""); // Xato bo'lsa inputni tozalaymiz
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const newSrc = e.target.result;
+
+                // A) Kichik Preview rasmni yangilash
+                const previewBox = $(`#preview-${order}`);
+                previewBox.attr("src", newSrc);
+                
+                // Rasmni chiroyli ko'rsatish uchun stil
+                previewBox.css({
+                    'padding': '0',
+                    'object-fit': 'cover',
+                    'width': '100%',
+                    'height': '100%'
+                });
+
+                // B) Katta Carousel rasmini ham yangilash (agar mavjud bo'lsa)
+                const carouselImg = $(`#carousel-img-${order}`);
+                if (carouselImg.length > 0) {
+                    carouselImg.attr("src", newSrc);
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // ==================================================
+    // 2. VALIDATSIYA (Kamida 1-rasm bo'lishi shart)
+    // ==================================================
+    $("#addProductForm").on("submit", function(e) {
+        const firstInput = $(".image-field[data-order='1']");
+        const firstPreview = $("#preview-1");
+
+        // Agar input bo'sh bo'lsa VA previewda hali ham default rasm tursa
+        if (firstInput.val() === "" && firstPreview.attr('src').includes('/img/upload.svg')) {
+            alert("Main image (first one) is required!");
+            e.preventDefault(); // Formani jo'natishni to'xtatadi
+            return false;
+        }
+        return true;
+    });
+
+    // ==================================================
+    // 3. STATUS CHANGE HANDLER (Siz yuborgan qism)
+    // ==================================================
     $(".status-select").on("change", async function(e) {
-        const id = $(this).data("id");      // data-id dan ID ni olamiz
-        const status = $(this).val();       // tanlangan status (ACTIVE, PAUSE...)
+        const id = $(this).data("id");
+        const status = $(this).val();
+        const element = $(this);
 
         try {
-            // Serverga yuborish
             const response = await axios.post("/seller/product/status", {
                 id: id,
                 productStatus: status
@@ -16,14 +108,12 @@ $(function() {
             console.log("Server javobi:", response.data);
 
             if (response.data.state === "success") {
-                // Muvaffaqiyatli bo'lsa, rangni yangilash (sizdagi funksiya)
-                // Agar updateStatusColor funksiyasi global bo'lsa, o'zi ishlayveradi.
-                // Lekin yaxshisi rangni shu yerda ham yangilab qo'yish mumkin:
-                $(this).removeClass("status-active status-pause status-delete");
-                $(this).addClass(`status-${status.toLowerCase()}`);
+                // Rangni yangilash
+                element.removeClass("status-active status-pause status-delete");
+                element.addClass(`status-${status.toLowerCase()}`);
                 
-                // Muvaffaqiyatli bo'lgani haqida kichik belgi (Toast)
-                alert("Status updated successfully!"); // Yoki chiroyliroq Toast ishlating
+                // Muvaffaqiyat xabari
+                // alert("Status updated successfully!"); 
             } else {
                 alert("Status update failed!");
             }
@@ -36,11 +126,9 @@ $(function() {
 
 });
 
-// Bu funksiya sizning HTML dagi onchange="updateStatusColor(this)" uchun kerak
-// Lekin biz yuqorida jQuery on('change') ishlatdik.
-// Ikkisi bir vaqtda ishlasa xato bermaydi, lekin jQuery varianti databasega yozadi.
+// HTML dagi onchange="updateStatusColor(this)" chaqiruvi xato bermasligi uchun
+// bu funksiyani tashqarida qoldiramiz.
 function updateStatusColor(element) {
-    // Bu funksiya faqat vizual rangni o'zgartiradi
     const val = element.value.toLowerCase();
     element.className = `status-select form-select form-select-sm status-${val}`;
 }

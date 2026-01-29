@@ -49,7 +49,7 @@
                 <% } %>
 
 
-                <form action="/seller/product/update/<%= product._id %>" method="POST" enctype="multipart/form-data">
+                <form action="/seller/product/update/<%= product._id %>" method="POST" enctype="multipart/form-data" id="editProductForm">
                     <div class="row g-4">
                         
                         <div class="col-12">
@@ -64,7 +64,7 @@
                                             class="<%= isExisting ? 'p-0' : 'p-3' %>"
                                             <% if (isExisting) { %>style="object-fit: cover;"<% } else { %>style="object-fit: contain;"<% } %>>
                                         
-                                        <input type="file" name="productImages" class="image-field" data-order="<%= i+1 %>">
+                                        <input type="file" name="productImages" class="image-field" data-order="<%= i+1 %>" accept="image/*">
                                     </div>
                                 <% } %>
                             </div>
@@ -137,9 +137,11 @@
                             <label class="form-label">Description</label>
                             <textarea name="productDesc" class="form-control" rows="4" required><%= product.productDesc %></textarea>
                         </div>
+                      
+                        <input type="hidden" name="imageIndexes" id="imageIndexes" value="">
 
                         <div class="col-12 mt-4 text-end">
-                            <button href="/seller/product/update/:id" type="submit" class="btn btn-outline-dark  fw-bold px-5">Save Changes</button>
+                            <button type="submit" class="btn btn-outline-dark  fw-bold px-5">Save Changes</button>
                         </div>
 
                     </div>
