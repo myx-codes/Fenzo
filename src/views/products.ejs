@@ -1,11 +1,197 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <div>Product</div>
-</body>
-</html>
+<%- include('includes/header') %>
+
+<link rel="stylesheet" href="/css/dashboard.css">
+<link rel="stylesheet" href="/css/products.css">
+
+<div class="container py-5">
+
+    <%- include('includes/dashboard-header', {
+        activeTab: 'products',
+        user: user
+    }) %>
+
+    <form action="/seller/products" method="GET">
+        <div class="panel mb-4 p-3">
+            <div class="row g-3">
+                
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                        </span>
+                        <input type="text" 
+                               name="search" 
+                               value="<%= search || '' %>" 
+                               class="form-control bg-light border-start-0" 
+                               placeholder="Search product...">
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <select class="form-select bg-light" name="productCollection">
+                        <option value="" <%= !productCollection ? 'selected' : '' %>>All Collections</option>
+                        <option value="CLOTHING" <%= productCollection === 'CLOTHING' ? 'selected' : '' %>>Clothing</option>
+                        <option value="PARFUM" <%= productCollection === 'PARFUM' ? 'selected' : '' %>>Parfum</option>
+                        <option value="COSMETICS" <%= productCollection === 'COSMETICS' ? 'selected' : '' %>>Cosmetics</option>
+                        <option value="BODY_CARE" <%= productCollection === 'BODY_CARE' ? 'selected' : '' %>>Body Care</option>
+                        <option value="VITAMINS" <%= productCollection === 'VITAMINS' ? 'selected' : '' %>>Vitamins</option>
+                        <option value="ELECTRONICS" <%= productCollection === 'ELECTRONICS' ? 'selected' : '' %>>Electronics</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <select class="form-select bg-light" name="order">
+                        <option value="new" <%= order === 'new' ? 'selected' : '' %>>Newest First</option>
+                        <option value="price_low" <%= order === 'price_low' ? 'selected' : '' %>>Price: Low to High</option>
+                        <option value="price_high" <%= order === 'price_high' ? 'selected' : '' %>>Price: High to Low</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-outline-dark flex-grow-1 fw-bold">Search</button>
+                    <a href="/seller/product/add" class="btn btn-dark flex-grow-1 fw-bold d-flex align-items-center justify-content-center"> 
+                        <i class="fa-solid fa-plus"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="panel p-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 custom-table">
+                <thead class="bg-light border-bottom">
+                    <tr>
+                        <th class="py-3 ps-4 text-uppercase" style="width: 35%; font-size:14px; letter-spacing:0.5px;">
+                            Product Name
+                        </th>
+
+                        <th class="py-3 text-uppercase" style="width: 13%; font-size:14px; letter-spacing:0.5px;">
+                            Category
+                        </th>
+
+                        <th class="py-3 text-uppercase" style="width: 13%; font-size:14px; letter-spacing:0.5px;">
+                            Price
+                        </th>
+
+                        <th class="py-3 text-uppercase" style="width: 13%; font-size:14px; letter-spacing:0.5px;">
+                            Quantity
+                        </th>
+
+                        <th class="py-3 text-center text-uppercase" style="width: 13%; font-size:14px; letter-spacing:0.5px;">
+                            Status
+                        </th>
+
+                        <th class="py-3 text-end pe-4 text-uppercase" style="width: 13%; font-size:14px; letter-spacing:0.5px;">
+                            Edit
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% if(products.length === 0) { %>
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <div class="py-4">
+                                    <i class="fa-solid fa-box-open fa-3x mb-3 text-light-emphasis"></i>
+                                    <p class="mb-0">No products found.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } else { %>
+                        <% products.map(function(ele) { %>
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="product-img-wrapper me-3">
+                                        <img src="/<%= ele.productImages[0] ? ele.productImages[0] : 'img/default-product.png' %>" 
+                                             class="product-img" 
+                                             alt="product">
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold text-dark"><%= ele.productName %></h6>
+                                        <small class="text-muted">ID: #<%= ele._id.toString().slice(-6).toUpperCase() %></small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border fw-normal px-2 py-1">
+                                    <%= ele.productCollection %>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-dark">$<%= ele.productPrice.toLocaleString() %></span>
+                            </td>
+                            <td>
+                                <span class="fw-medium <%= ele.productStock < 5 ? 'text-danger' : 'text-dark' %>">
+                                    <%= ele.productStock %> 
+                                </span>
+                            </td>
+                            
+                            <td class="text-center">
+                                <select class="status-select form-select form-select-sm status-<%= ele.productStatus.toLowerCase() %>" 
+                                        data-id="<%= ele._id %>"
+                                        onchange="updateStatusColor(this)">
+                                    <option value="ACTIVE" <%= ele.productStatus === 'ACTIVE' ? 'selected' : '' %>>ACTIVE</option>
+                                    <option value="PAUSE" <%= ele.productStatus === 'PAUSE' ? 'selected' : '' %>>PAUSE</option>
+                                    <option value="DELETE" <%= ele.productStatus === 'DELETE' ? 'selected' : '' %>>DELETE</option>
+                                </select>
+                            </td>
+
+                            <td class="text-end pe-4">
+                                <a href="/seller/product/update/<%= ele._id %>" class="btn btn-sm btn-light border text-muted">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <% if(products.length > 0) { %>
+        <div class="position-relative d-flex justify-content-center align-items-center p-3 border-top bg-light"> 
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    
+                    <li class="page-item <%= currentPage <= 1 ? 'disabled' : '' %>">
+                        <a class="page-link border-0 bg-transparent" 
+                           href="/seller/products?page=<%= currentPage - 1 %>&search=<%= search %>&productCollection=<%= productCollection %>&order=<%= order %>">
+                           <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link border rounded-2 <%= currentPage === i ? 'bg-white text-dark shadow-sm fw-bold' : 'bg-transparent text-muted' %> mx-1" 
+                               href="/seller/products?page=<%= i %>&search=<%= search %>&productCollection=<%= productCollection %>&order=<%= order %>">
+                                <%= i %>
+                            </a>
+                        </li>
+                    <% } %>
+
+                    <li class="page-item <%= currentPage >= totalPages ? 'disabled' : '' %>">
+                        <a class="page-link border-0 bg-transparent" 
+                           href="/seller/products?page=<%= currentPage + 1 %>&search=<%= search %>&productCollection=<%= productCollection %>&order=<%= order %>">
+                           <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+        </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+    // Front-endda rangni darhol o'zgartirish uchun (UX)
+    function updateStatusColor(selectElement) {
+        selectElement.classList.remove('status-active', 'status-pause', 'status-delete');
+        const val = selectElement.value;
+        selectElement.classList.add('status-' + val.toLowerCase());
+    }
+</script>
+<script src="/js/products.js"></script>
+<%- include('includes/footer') %>

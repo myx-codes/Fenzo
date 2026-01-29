@@ -25,11 +25,15 @@ routerSeller
 
 
 routerSeller
-.get("/product/all", 
+.get("/products", 
     sellerController.verifySeller, 
     productController.getAllProducts)
 
 routerSeller
+.get("/product/add", 
+    sellerController.verifySeller,
+    makeuploader("products").array("productImages", 5),
+    productController.goAddProduct)
 .post("/product/add", 
     sellerController.verifySeller,
     makeuploader("products").array("productImages", 5),

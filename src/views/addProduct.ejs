@@ -1,0 +1,132 @@
+<%- include('includes/header') %>
+<link rel="stylesheet" href="/css/products.css">
+
+<div class="container py-5">
+
+    <%- include('includes/dashboard-header', {
+        activeTab: 'products',
+        user: user
+    }) %>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold m-0 text-dark">Add New Product</h4>
+                <a href="/seller/products" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Back to List
+                </a>
+            </div>
+
+            <div class="panel p-4 p-md-5">
+                <form action="/seller/product/add" method="POST" enctype="multipart/form-data" id="addProductForm">
+                    
+                    <div class="row g-4">
+                        
+                        <div class="col-12">
+                            <label class="form-label">Product Images (Max 5)</label>
+                            <div class="image-upload-container">
+                                
+                                <div class="upload-box shadow-sm">
+                                    <img src="/img/upload.svg" id="preview-1" alt="Upload">
+                                    <input type="file" name="productImages" class="image-field" data-order="1" required>
+                                </div>
+
+                                <% for(let i = 2; i <= 5; i++) { %>
+                                <div class="upload-box shadow-sm">
+                                    <img src="/img/upload.svg" id="preview-<%= i %>" alt="Upload">
+                                    <input type="file" name="productImages" class="image-field" data-order="<%= i %>">
+                                </div>
+                                <% } %>
+
+                            </div>
+                            <small class="text-muted d-block mt-2 text-center" style="font-size: 12px;">
+                                Supported formats: JPG, JPEG, PNG, WEBP. First image is required.
+                            </small>
+                        </div>
+
+                        <div class="col-12"><hr class="text-muted opacity-25"></div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Product Name</label>
+                            <input type="text" name="productName" class="form-control" placeholder="e.g. Summer T-Shirt" required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Price ($)</label>
+                            <input type="number" name="productPrice" class="form-control" placeholder="0" min="0" required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" name="productStock" class="form-control" placeholder="0" min="0" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Collection</label>
+                            <select name="productCollection" class="form-select" required>
+                                <option value="" selected disabled>Select Collection</option>
+                                <option value="CLOTHING">Clothing</option>
+                                <option value="PARFUM">Parfum</option>
+                                <option value="COSMETICS">Cosmetics</option>
+                                <option value="BODY_CARE">Body Care</option>
+                                <option value="VITAMINS">Vitamins</option>
+                                <option value="ELECTRONICS">Electronics</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Product Type</label>
+                            <select name="productType" class="form-select" required>
+                                <option value="" selected disabled>Select Type</option>
+                                <option value="PHYSICAL">Physical Item</option>
+                                <option value="DIGITAL">Digital Item</option>
+                                <option value="SET">Set / Bundle</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Target Gender</label>
+                            <select name="productGender" class="form-select" required>
+                                <option value="" selected disabled>Select Gender</option>
+                                <option value="MALE">Male</option>
+                                <option value="FEMALE">Female</option>
+                                <option value="UNISEX">Unisex</option>
+                                <option value="KIDS">Kids</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Unit Type</label>
+                            <select name="productUnit" class="form-select" required>
+                                <option value="PIECE">Piece (dona)</option>
+                                <option value="PACK">Pack</option>
+                                <option value="SET">Set</option>
+                                <option value="KG">Kilogram</option>
+                                <option value="LITRE">Litre</option>
+                                <option value="ML">Millilitre</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea name="productDesc" class="form-control" rows="4" placeholder="Write something about the product..." required></textarea>
+                        </div>
+
+                        <input type="hidden" name="productStatus" value="ACTIVE">
+
+                        <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+                            <a href="/seller/products" class="btn btn-light border fw-bold text-muted px-4">Cancel</a>
+                            <button href="/seller/products" type="submit" class="btn btn-dark fw-bold px-5">Publish Product</button>
+                        </div>
+                        
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="/js/products.js"></script>
+<%- include('includes/footer') %>

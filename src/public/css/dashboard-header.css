@@ -10,7 +10,7 @@
     text-decoration: none;
     color: #64748b;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 20px;
     padding-bottom: 12px;
     border-bottom: 2px solid transparent;
     transition: all 0.3s ease;
@@ -88,7 +88,8 @@
     padding: 5px;
     padding-right: 20px;
     border-radius: 50px; /* Pill shape */
-    height: 50px;
+    height: 70px;
+    width: 220px;
     transition: box-shadow 0.3s ease;
 }
 
@@ -97,8 +98,8 @@
 }
 
 .profile-avatar {
-    width: 38px;
-    height: 38px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     overflow: hidden;
     background-color: #f1f5f9;
@@ -121,18 +122,20 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     line-height: 1.1;
 }
 
 .profile-name {
     font-weight: 700;
     color: #1e293b;
-    font-size: 14px;
+    font-size: 20px;
     margin: 5px;
 }
 
 .profile-role {
-    font-size: 10px;
+    font-size: 11px;
+    align-items: center;
     text-transform: uppercase;
     color: #94a3b8;
     letter-spacing: 0.5px;

@@ -1,87 +1,43 @@
-console.log("Products frontend javascript file");
+$(function() {
+    console.log("Products Frontend JS Ready");
 
-$(function(){
-    $(".product-collection").on("change", () => {
-        const selectedValue = $(".product-collection").val();
-        if(selectedValue === "DRINK"){
-            $("#product-collection").hide();
-            $("#product-volume").show();
-        }else{
-            $("#product-volume").hide();
-            $("#product-collection").show();
-        }
-    });
+    // 1. IMAGE PREVIEW HANDLER
+    $(".image-field").on("change", function() {
+        const input = this;
+        const order = $(this).data("order"); // 1, 2, 3...
+        const file = input.files[0];
 
-    $("#process-btn").on("click", () => {
-        $(".dish-container").slideToggle(500);
-        $("#process-btn").css(("display", "none"));
-    });
+        if (file) {
+            // Fayl turini tekshirish
+            const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp", "image/avif"];
+            if (!validTypes.includes(file.type)) {
+                alert("Please upload a valid image file (JPG, PNG, WEBP).");
+                $(input).val(""); // Inputni tozalash
+                return;
+            }
 
-    $("#cancel-btn").on("click", () => {
-        $(".dish-container").slideToggle(100);
-        $("#process-btn").css(("display", "flex"));
-    })
-
-
-    $(".new-product-status").on("change", async function(e) {
-        const id = e.target.id
-        const productStatus = $(`#${id}.new-product-status`).val();
-        console.log("id", id);
-        console.log("productStatus", productStatus);
-
-        try{
-            const response = await axios.post(`/admin/product/${id}`, {productStatus: productStatus});
-            console.log("response", response);
-            const result = response.data;
-            if(result.data){
-                console.log("Product updated");
-                $(".new-product-status").blur();
-            }else alert("Product update failed");
-        }catch(err){
-            console.log(err);
-            alert("Product update failed")
-        }
-    })
-});
-
-function validateForm(){
-    const memberName = $(".product-name").val();
-    const memberPrice = $(".productName").val();
-    const productLeftCount = $(".product-left-count").val();
-    const productCollection = $(".product-collection").val();
-    const productDesc = $(".product-desc").val();
-    const productStatus = $(".product-status").val();
-    if (
-        memberName === "" ||
-        memberPrice === "" ||
-        productLeftCount === "" ||
-        productCollection === "" ||
-        productDesc === "" ||
-        productStatus=== "" 
-    ) {
-        alert("Please insert all required inputs");
-        return false;
-    }else return true
-
-}
-
-
-function previewFileHandler(input, order){
-    const imgClassName = input.className;
-    console.log("imgClassName", imgClassName);
-
-    const file = $(`.${imgClassName}`).get(0).files[0];
-    const fileType = file["type"]
-    const validImageType = ["image/jpeg", "image/png", "image/jpg", "image/avif"];
-    if (!validImageType.includes(fileType)) {
-    alert("Please insert only jpeg, jpg and png");
-    }else{
-        if(file){
+            // 
             const reader = new FileReader();
-            reader.onload = function(){
-                $(`#image-section-${order}`).attr("src", reader.result);
-            };
-            reader.readAsDataURL(file)
+            reader.onload = function(e) {
+                // Rasm manzilini img tegiga o'rnatamiz
+                $(`#preview-${order}`).attr("src", e.target.result);
+                // Stilni o'zgartirish (rasm yuklanganda border yo'qolishi uchun yoki chiroyli bo'lishi uchun)
+                $(`#preview-${order}`).css('padding', '0'); 
+            }
+            reader.readAsDataURL(file);
         }
-    }
-}
+    });
+
+    // 2. FORM VALIDATION (Qo'shimcha tekshiruv)
+    $("#addProductForm").on("submit", function(e) {
+        // Agar birinchi rasm yuklanmagan bo'lsa
+        if ($(".image-field[data-order='1']").val() === "") {
+            alert("Main image (first one) is required!");
+            e.preventDefault();
+            return false;
+        }
+        
+        // Boshqa tekshiruvlar HTML 'required' atributi orqali ishlaydi
+        return true;
+    });
+});

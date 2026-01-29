@@ -23,6 +23,7 @@ sellerController.goHome = ( req: Request, res: Response) => {
 };
 
 
+
 sellerController.getSignup = (req: Request, res: Response) => {
     try{
         console.log("Signup Page");
