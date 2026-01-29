@@ -55,6 +55,19 @@ export interface SellerRequest extends Request {
     files?: Express.Multer.File[];
 }
 
+export interface CustomersResponse {
+    list: User[];
+    total: number;
+}
+
+export interface CustomerInQuery {
+    page: number;
+    limit: number;
+    order?: string;          // Tartiblash (Masalan: yangilar tepada)
+    search?: string;         // Qidiruv (Ism yoki Telefon raqam bo'yicha)
+    userStatus?: UserStatus; // Filter: ACTIVE, BLOCK, DELETE
+}
+
 // export interface SellerRequest extends Request{
 //     user: User;
 //     session: Session & {user: User};

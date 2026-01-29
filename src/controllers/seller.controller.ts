@@ -1,10 +1,11 @@
 import { Errors, HttpCode, Message } from "../libs/Errors";
 import { T } from "../libs/types/common";
 import { NextFunction, Request, Response } from "express"
-import { LoginInput, UserInput } from "../libs/types/user";
-import { UserType } from "../libs/enums/user.enums";
+import { CustomerInQuery, LoginInput, UserInput } from "../libs/types/user";
+import { UserStatus, UserType } from "../libs/enums/user.enums";
 import SellerService from "../models/Seller.service";
 import { SellerRequest } from "../libs/types/user";
+import UserService from "src/models/User.service";
 
 const sellerController: T = {};
 const sellerService = new SellerService();
@@ -64,14 +65,40 @@ sellerController.goDashboard = (req: SellerRequest, res: Response) => {
 
 sellerController.getCustomers = async (req: Request, res: Response) => {
     try {
-        console.log("customers");
-        const result = await sellerService.getCustomers();
-        res.render("customers")
-    } catch (err) {
-        console.log("Error, customers:", err);
+        console.log("getCustomers");
         
+        // 1. URL Query'dan parametrlarni olamiz
+        const { page, limit, order, search, userStatus } = req.query;
+
+        // 2. CustomerInQuery obyektini yasaymiz
+        const inquery: CustomerInQuery = {
+            order: order ? String(order) : 'createdAt', // Agar order kelmasa, default 'createdAt'
+            page: Number(page) || 1,                    // Agar page kelmasa, default 1
+            limit: Number(limit) || 8,                 // Agar limit kelmasa, default 10
+        };
+
+        // 3. Optional filtrlarni qo'shamiz (Search va Status)
+        if (search) inquery.search = String(search);
+        
+        if (userStatus) inquery.userStatus = userStatus as UserStatus;
+
+        // 4. Servicega so'rov yuboramiz
+        const result = await sellerService.getCustomers(inquery);
+
+        // 5. Frontendga Render qilamiz (EJS faylga)
+        res.render("customers", {
+            customers: result.list,         // Topilgan odamlar
+            currentPage: inquery.page,      // Hozirgi sahifa
+            totalPages: result.totalPage,   // Jami sahifalar
+            // Filtrlarni ham qaytarib yuborsak, inputlarda saqlanib turadi (search valuelar)
+            search: inquery.search || "",
+            statusFilter: inquery.userStatus || ""
+        });
+
+    } catch (err) {
+        console.log("Error, getCustomers:", err);
         if (err instanceof Errors) res.status(err.code).json(err);
-        else res.status(500).json({ message: "Internal Server Error" });
+        else res.status(Errors.standard.code).json(Errors.standard);
     }
 };
 
@@ -146,6 +173,19 @@ sellerController.logout = async (req: SellerRequest, res: Response) => {
     res.redirect("/seller");
   }
 };
+
+sellerController.updateChosenUser = async (req: Request, res:Response) => {
+   try{
+    console.log("updateChosenUser");
+    console.log("REQ.BODY", req.body)
+    const result = await sellerService.updateChosenUser(req.body);
+    res.status(HttpCode.OK).json({data: result});
+   }catch(err){
+    console.log("Error, updateChosenUser", err);
+    if(err instanceof Errors)res.status(err.code).json(err);
+    else res.status(Errors.standard.code).json(Errors.standard);
+   }
+}
 
 sellerController.checkAuthSession = async (req: SellerRequest, res: Response) => {
     try{

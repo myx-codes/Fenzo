@@ -1,143 +1,92 @@
-.login-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-  animation: gradient 15s ease infinite;
-  -webkit-animation: gradient 15s ease infinite;
-  background-size: 200% 200%;
+/* Card Dizayni (Signup bilan bir xil) */
+.card {
+    border: none;
+    transition: transform 0.3s ease;
 }
 
-.login-container a {
-  text-decoration: none;
-  color: black;
+/* Input Group Text (Chap tarafdagi iconlar) */
+.input-group-text {
+    background-color: #f8f9fa;
+    border-right: none;
+    color: #6c757d; /* text-muted rangi */
+    transition: all 0.3s ease;
 }
 
-.login-container .login-frame {
-  position: relative;
-  width: 420px;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  border-radius: 10px;
-  background: #ffffff;
-  padding: 25px;
+/* Input maydonlari */
+.form-control {
+    background-color: #f8f9fa;
+    border-left: none;
+    border-right: none; /* O'ng tarafni ochib qo'yamiz (ko'z tugmasi uchun) */
+    padding-left: 0;
+    transition: all 0.3s ease;
 }
 
-.login-container .login-frame .login-top {
-  position: relative;
-  width: 100%;
-  height: auto;
-  display: flex;
-  flex-direction: column;
+/* Oddiy inputlar uchun o'ng chegara kerak */
+.input-group > .form-control:not(#passwordInput) {
+    border-right: 1px solid #dee2e6;
 }
 
-.login-container .login-top span {
-  font-family: "Poppins";
-  font-style: normal;
-  font-weight: 700;
-  font-size: 30px;
-  line-height: 34px;
+/* Toggle Password Button (Ko'z tugmasi) */
+#togglePassword {
+    background-color: #f8f9fa;
+    border-left: none;
+    border-color: #dee2e6;
+    color: #6c757d;
+    transition: all 0.3s ease;
+    z-index: 5; /* Input ustiga chiqib qolmasligi uchun */
 }
 
-.login-container .login-top p {
-  margin-top: 15px;
-  font-family: "Poppins";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 26px;
+#togglePassword:hover {
+    color: #212529; /* Sichqoncha borganda to'q rang */
+    cursor: pointer;
 }
 
-.login-container .login-top div {
-  font-family: "Poppins";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 26px;
+/* --- FOCUS EFFEKTLARI --- */
+
+/* Inputga bosilganda (Focus) fon oqaradi */
+.form-control:focus {
+    background-color: #fff;
+    box-shadow: none;
+    border-color: #dee2e6;
 }
 
-.login-container .login-frame .login-input-frame {
-  position: relative;
-  width: 100%;
-  height: auto;
-  display: flex;
-  flex-direction: column;
+/* Input focus bo'lganda chapdagi icon ham oqaradi va qorayadi */
+.input-group:focus-within .input-group-text {
+    background-color: #fff;
+    border-color: #212529; /* Qora border */
 }
 
-.login-container .login-input-container {
-  position: relative;
-  margin-top: 15px;
-  width: 100%;
-  height: auto;
-  display: flex;
-  flex-direction: column;
+.input-group:focus-within .input-group-text i {
+    color: #212529 !important; /* Icon qora bo'ladi */
 }
 
-.login-container .login-input-container label {
-  margin-bottom: 0px;
-  font-family: "Poppins";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 18px;
+/* Input focus bo'lganda inputning o'zi */
+.input-group:focus-within .form-control {
+    background-color: #fff;
+    border-color: #212529;
 }
 
-.login-container .login-input-container input {
-  position: relative;
-  margin-top: 10px;
-  padding-left: 20px;
-  width: 100%;
-  height: 55px;
-  background: #f6f5f5;
-  border: 1px solid #dddddd;
-  border-radius: 8px;
+/* Input focus bo'lganda o'ngdagi ko'z tugmasi */
+.input-group:focus-within #togglePassword {
+    background-color: #fff;
+    border-color: #212529;
 }
 
-.login-container .login-frame .login-btn {
-  position: relative;
-  margin-top: 25px;
-  width: 100%;
-  height: 70px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #33a0ff;
-  border-radius: 10px;
-  font-family: "Nunito";
-  font-style: normal;
-  font-weight: 800;
-  font-size: 24px;
-  line-height: 33px;
-  letter-spacing: -0.02em;
-  color: #ffffff;
+/* Login Button */
+.btn-outline-dark {
+    border-width: 2px;
+    transition: all 0.3s ease;
 }
 
-/* Background animation */
-@-webkit-keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+.btn-outline-dark:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-@keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+/* Links */
+a.text-warning {
+    transition: color 0.3s ease;
+}
+a.text-warning:hover {
+    color: #d68c0b !important;
 }

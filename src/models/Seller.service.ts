@@ -1,8 +1,9 @@
 import UserModel from "../schema/User.model";
 import * as bcrypt from "bcryptjs"
-import { UserInput, User, LoginInput } from "../libs/types/user";
+import { UserInput, User, LoginInput, CustomersResponse, CustomerInQuery, UserUpdateInput } from "../libs/types/user";
 import { Errors, HttpCode, Message } from "../libs/Errors";
 import { UserStatus, UserType } from "../libs/enums/user.enums";
+import { shapeIntoMongooseObjectId } from "../libs/config";
 
 
 
@@ -13,14 +14,56 @@ class SellerService{
     }
 
 
-     public async getCustomers(): Promise<User[]>{
-        const result = await this.userModel
-        .find({userType: UserType.CUSTOMER})
-        .lean()
-        .exec()
-        if(!result || result.length === 0) throw new Errors(HttpCode.BAD_REQUEST, Message.NO_DATA_FOUND);
-        return result as User[];
+    public async getCustomers(inquery: CustomerInQuery) {
+    
+    // 1. $MATCH: Dastlabki filtrlash
+    const match: any = { userType: UserType.CUSTOMER };
+
+    // A) Agar "search" yozilgan bo'lsa (Ism yoki Telefon orqali qidirish)
+    if (inquery.search) {
+        match.$or = [
+            { userNick: { $regex: new RegExp(inquery.search, "i") } }, // "i" = case insensitive (Katta-kichik harf farqi yo'q)
+            { userPhone: { $regex: new RegExp(inquery.search, "i") } }
+        ];
     }
+
+    // B) Agar "status" tanlangan bo'lsa (ACTIVE, BLOCK)
+    if (inquery.userStatus) {
+        match.userStatus = inquery.userStatus;
+    }
+
+    // 2. $SORT: Tartiblash (Default: Eng yangilar tepada)
+    const sort: any = { [inquery.order || 'createdAt']: -1 };
+
+    // 3. AGGREGATE so'rovini bajarish
+    const result = await this.userModel.aggregate([
+        { $match: match },     // Kerakli odamlarni saralab olish
+        { $sort: sort },       // Tartiblash
+        { $skip: (inquery.page - 1) * inquery.limit }, // Sahifalash: O'tkazib yuborish
+        { $limit: inquery.limit } // Sahifalash: Cheklash
+    ]).exec();
+
+    // 4. TOTAL COUNT: Jami nechta ekanligini hisoblash (Pagination tugmalari uchun)
+    // Aggregation bilan birga countDocuments ishlatish eng optimal yo'l.
+    const total = await this.userModel.countDocuments(match);
+
+    return { 
+        list: result, 
+        totalPage: Math.ceil(total / inquery.limit) 
+    };
+  };
+
+  public async updateChosenUser(input: UserUpdateInput): Promise<User>{
+    input._id = shapeIntoMongooseObjectId(input._id);
+    const data = input._id
+    console.log("DATA:", data)
+    const result = await this.userModel
+    .findByIdAndUpdate({_id: input._id}, input, {new: true})
+    .lean()
+    .exec();
+    if(!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+    return result as User
+  }
 
     public async processSignup(input: UserInput): Promise<User> {
     const exist = await this.userModel

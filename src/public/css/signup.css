@@ -1,191 +1,80 @@
-.signup-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-  animation: gradient 15s ease infinite;
-  -webkit-animation: gradient 15s ease infinite;
-  background-size: 200% 200%;
+/* Card dizayni */
+.card {
+    border: none;
+    transition: transform 0.3s ease;
 }
 
-.signup-container a {
-  text-decoration: none;
-  color: black;
+/* Rasm yuklash joyi (Avatar) */
+.upload-img-frame {
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    border: 4px solid #fff; /* Oq ramka */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); /* Yumshoq soya */
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
 }
 
-.signup-container .signup-frame {
-  position: relative;
-  width: 420px;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  border-radius: 10px;
-  background: #ffffff;
-  padding: 25px;
+.upload-img-frame:hover {
+    transform: scale(1.05); /* Sichqoncha borganda sal kattalashadi */
+    border-color: #e9ecef;
 }
 
-.signup-container .signup-frame .sign-input-frame {
-  position: relative;
-  width: 100%;
-  height: auto;
-  display: flex;
-  flex-direction: row;
+.upload-img-frame.success {
+    border-color: #198754; /* Rasm yuklanganda yashil ramka */
 }
 
-.signup-container .sign-input-frame .sign-up-frame {
-  position: relative;
-  margin-top: 15px;
-  width: 49%;
-  height: auto;
-  display: flex;
-  flex-direction: column;
+/* Inputlar dizayni */
+.input-group-text {
+    background-color: #f8f9fa;
+    border-right: none;
+    transition: all 0.3s ease;
 }
 
-.signup-container .sign-up-frame label {
-  margin-bottom: 0px;
-  font-family: "Poppins";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 18px;
+.form-control {
+    background-color: #f8f9fa;
+    border-left: none;
+    padding-left: 0;
+    transition: all 0.3s ease;
 }
 
-.signup-container .sign-up-frame input {
-  position: relative;
-  margin-top: 10px;
-  padding-left: 20px;
-  width: 100%;
-  height: 55px;
-  background: #f6f5f5;
-  border: 1px solid #dddddd;
-  border-radius: 8px;
+/* Inputga yozilayotganda (Focus holati) */
+.form-control:focus {
+    background-color: #fff;
+    box-shadow: none; /* Standart ko'k nurini o'chirish */
+    border-color: #dee2e6;
 }
 
-.signup-container .media-frame {
-  position: relative;
-  margin-top: 15px;
-  width: 100%;
-  height: 250px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+/* Input focus bo'lganda icon va inputni birxil rangga kiritish */
+.input-group:focus-within .input-group-text {
+    background-color: #fff;
+    border-color: #212529; /* Qora border */
 }
 
-.signup-container .media-frame .upload-img-frame {
-  position: relative;
-  width: 275px;
-  height: 93%;
-  display: flex;
-  border-radius: 15px;
+.input-group:focus-within .input-group-text i {
+    color: #212529 !important; /* Icon rangi qorayadi */
 }
 
-.signup-container .upload-img-frame .delete-img {
-  position: absolute;
-  width: 37px;
-  height: 37px;
-  right: 5%;
-  top: 5%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #ffffff;
-  box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
-  border-radius: 8px;
+.input-group:focus-within .form-control {
+    background-color: #fff;
+    border-color: #212529;
 }
 
-.signup-container .media-frame .upload-container {
-  position: relative;
-  margin-left: 30px;
-  width: 75%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+/* Tugma (Button) */
+.btn-outline-dark {
+    border-width: 2px;
+    transition: all 0.3s ease;
 }
 
-.signup-container .media-text {
-  font-family: "GT Walsheim Pro";
-  font-style: normal;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 18px;
-  color: #140342;
+.btn-outline-dark:hover {
+    transform: translateY(-2px); /* Bosishga undash uchun sal ko'tariladi */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-.signup-container .file-box input[type="file"] {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
+/* Link */
+a.text-warning {
+    transition: color 0.3s ease;
 }
-
-.signup-container .file-box label {
-  margin-bottom: 0px;
-  width: 138px;
-  height: 55px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #6a7a99;
-  border-radius: 0px 8px 8px 0px;
-  font-family: "GT Walsheim Pro";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 26px;
-  color: #ffffff;
-}
-
-.signup-container .file-box .upload-name {
-  position: relative;
-  padding: 20px;
-  width: 85%;
-  height: 55px;
-  display: flex;
-  background: #ffffff;
-  border: 1px solid #dddddd;
-  border-radius: 8px 0px 0px 8px;
-}
-
-.signup-container .thumbnail-desc {
-  margin-top: 25px;
-  font-family: "GT Walsheim Pro";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 26px;
-  color: #4f547b;
-}
-
-/* Background animation */
-@-webkit-keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+a.text-warning:hover {
+    color: #d68c0b !important; /* To'q sariq */
 }

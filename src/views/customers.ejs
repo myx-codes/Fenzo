@@ -7,40 +7,45 @@
 
     <%- include('includes/dashboard-header', {
         activeTab: 'customers',
-        <!-- pageTitle: 'Customers', -->
-        <!-- pageSubtitle: 'Manage your customer base', -->
-        user: user 
+        user: customers
     }) %>
 
-    <div class="panel mb-4 p-3">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0">
-                        <i class="fa-solid fa-magnifying-glass text-muted"></i>
-                    </span>
-                    <input type="text" class="form-control bg-light border-start-0" placeholder="Search by name, email...">
+    <form action="/seller/customers" method="GET">
+        <div class="panel mb-4 p-3">
+            <div class="row g-3">
+                
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                        </span>
+                        <input type="text" 
+                               name="search" 
+                               value="<%= search %>" 
+                               class="form-control bg-light border-start-0" 
+                               placeholder="Search by name, phone...">
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <select class="form-select bg-light" name="userStatus">
+                        <option value="" <%= statusFilter === '' ? 'selected' : '' %>>All Statuses</option>
+                        <option value="ACTIVE" <%= statusFilter === 'ACTIVE' ? 'selected' : '' %>>Active</option>
+                        <option value="BLOCK" <%= statusFilter === 'BLOCK' ? 'selected' : '' %>>Blocked</option>
+                        <option value="DELETE" <%= statusFilter === 'DELETE' ? 'selected' : '' %>>Deleted</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <input type="date" name="date" class="form-control bg-light">
+                </div>
+
+                <div class="col-md-2 text-end">
+                    <button type="submit" class="btn btn-outline-dark w-100 fw-bold">Search</button>
                 </div>
             </div>
-
-            <div class="col-md-3">
-                <select class="form-select bg-light">
-                    <option value="">All Statuses</option>
-                    <option value="ACTIVE">Active</option>
-                    <option value="BLOCK">Blocked</option>
-                </select>
-            </div>
-
-            <div class="col-md-3">
-                <input type="date" class="form-control bg-light">
-            </div>
-
-            <div class="col-md-2 text-end">
-                <button class="btn btn-outline-dark w-100 fw-bold">Filter</button>
-            </div>
         </div>
-    </div>
-
+    </form>
     <div class="panel p-0 overflow-hidden">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0 custom-table">
@@ -48,71 +53,96 @@
                     <tr>
                         <th class="py-3 ps-4 text-uppercase" style="font-size:11px; letter-spacing:0.5px;">Customer</th>
                         <th class="py-3 text-uppercase" style="font-size:11px; letter-spacing:0.5px;">Contact Info</th>
-                        <th class="py-3 text-uppercase" style="font-size:11px; letter-spacing:0.5px;">Orders / Spent</th>
                         <th class="py-3 text-uppercase" style="font-size:11px; letter-spacing:0.5px;">Joined Date</th>
                         <th class="py-3 text-center text-uppercase" style="font-size:11px; letter-spacing:0.5px;">Status</th>
                     </tr>
                 </thead>
 
                 <tbody>
+                    <% customers.map(function(ele, index) { %>
                     <tr>
                         <td class="ps-4">
                             <div class="d-flex align-items-center">
-                                <div class="avatar-circle bg-primary-subtle text-primary me-3">A</div>
+                                <% if(ele.userImage) { %>
+                                    <img src="/<%= ele.userImage %>" class="avatar-circle me-3" style="object-fit:cover;" alt="avatar">
+                                <% } else { %>
+                                    <div class="avatar-circle bg-primary-subtle text-primary me-3 fw-bold">
+                                        <%= ele.userNick.charAt(0).toUpperCase() %>
+                                    </div>
+                                <% } %>
+
                                 <div>
-                                    <h6 class="mb-0 fw-bold text-dark"><%= user.userNick %></h6>
-                                    <small class="text-muted">ID: #CUS-8821</small>
+                                    <h6 class="mb-0 fw-bold text-dark"><%= ele.userNick %></h6>
+                                    <small class="text-muted">ID: #<%= ele._id.toString().slice(-6).toUpperCase() %></small>
                                 </div>
                             </div>
                         </td>
                         <td>
                             <div class="d-flex flex-column">
-                                <span class="fw-medium text-dark">ali@gmail.com</span>
-                                <span class="text-muted small"><%= user.userPhone %></span>
+                                <span class="fw-medium text-dark"><%= ele.userPhone %></span>
                             </div>
                         </td>
+                       
                         <td>
-                            <div class="d-flex flex-column">
-                                <span class="fw-bold text-dark">8 Orders</span>
-                                <span class="text-success small fw-bold">$1,240.00</span>
-                            </div>
+                            <span class="text-muted small">
+                                <%= new Date(ele.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                            </span>
                         </td>
-                        <td><span class="text-muted small">Oct 24, 2024</span></td>
+                        
                         <td class="text-center">
-                            <select class="status-select status-active form-select form-select-sm" onchange="updateStatusColor(this)">
-                                <option value="ACTIVE" selected>ACTIVE</option>
-                                <option value="BLOCK">BLOCK</option>
-                                <option value="DELETE">DELETE</option>
+                            <select class="status-select form-select form-select-sm status-<%= ele.userStatus.toLowerCase() %>" 
+                                    id="<%= ele._id %>"> 
+                                <option value="ACTIVE" <%= ele.userStatus === 'ACTIVE' ? 'selected' : '' %>>ACTIVE</option>
+                                <option value="BLOCK" <%= ele.userStatus === 'BLOCK' ? 'selected' : '' %>>BLOCK</option>
+                                <option value="DELETE" <%= ele.userStatus === 'DELETE' ? 'selected' : '' %>>DELETE</option>
                             </select>
                         </td>
+                    </tr>
+                    <% }) %>
                 </tbody>
             </table>
         </div>
 
-          <div class="position-relative d-flex justify-content-center align-items-center p-3 border-top bg-light"> 
+        <div class="position-relative d-flex justify-content-center align-items-center p-3 border-top bg-light"> 
             <nav>
                 <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item disabled"><a class="page-link border-0 bg-transparent" href="#"><i class="fa-solid fa-chevron-left"></i></a></li>
-                    <li class="page-item active"><a class="page-link border rounded-2 bg-white text-dark shadow-sm fw-bold mx-1" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link border-0 bg-transparent text-muted" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link border-0 bg-transparent" href="#"><i class="fa-solid fa-chevron-right"></i></a></li>
+                    
+                    <li class="page-item <%= currentPage <= 1 ? 'disabled' : '' %>">
+                        <a class="page-link border-0 bg-transparent" 
+                           href="/seller/customers?page=<%= currentPage - 1 %>&search=<%= search %>&userStatus=<%= statusFilter %>">
+                           <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link border rounded-2 <%= currentPage === i ? 'bg-white text-dark shadow-sm fw-bold' : 'bg-transparent text-muted' %> mx-1" 
+                               href="/seller/customers?page=<%= i %>&search=<%= search %>&userStatus=<%= statusFilter %>">
+                                <%= i %>
+                            </a>
+                        </li>
+                    <% } %>
+
+                    <li class="page-item <%= currentPage >= totalPages ? 'disabled' : '' %>">
+                        <a class="page-link border-0 bg-transparent" 
+                           href="/seller/customers?page=<%= currentPage + 1 %>&search=<%= search %>&userStatus=<%= statusFilter %>">
+                           <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </li>
+
                 </ul>
             </nav>
         </div>
-    </div>
+        </div>
 </div>
 
 <script>
     function updateStatusColor(selectElement) {
-        // Hamma rang klasslarini olib tashlash
         selectElement.classList.remove('status-active', 'status-block', 'status-delete');
-        
-        // Yangi rang klassini qo'shish
         const val = selectElement.value;
-        if (val === 'ACTIVE') selectElement.classList.add('status-active');
-        else if (val === 'BLOCK') selectElement.classList.add('status-block');
-        else if (val === 'DELETE') selectElement.classList.add('status-delete');
+        selectElement.classList.add('status-' + val.toLowerCase());
     }
 </script>
+<script src="/js/customer.js"></script>
 
 <%- include('includes/footer') %>

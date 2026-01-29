@@ -36,4 +36,8 @@ routerSeller
     productController.addProduct)
 
 
+routerSeller
+.post("/customer/update", sellerController.updateChosenUser)
+
+
 export default routerSeller;
