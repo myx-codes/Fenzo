@@ -21,7 +21,7 @@ sellerController.processSignup)
 routerSeller
 .get("/dashboard", sellerController.goDashboard)
 .get("/customers", sellerController.getCustomers)
-.get("check-me", sellerController.checkAuthSession)
+.get("/check-me", sellerController.checkAuthSession)
 
 
 routerSeller
@@ -38,6 +38,7 @@ routerSeller
 
 routerSeller
 .post("/customer/update", sellerController.updateChosenUser)
+.post("/product/:id", productController.updateChosenProduct)
 
 
 export default routerSeller;
