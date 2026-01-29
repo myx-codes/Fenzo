@@ -1,43 +1,46 @@
 $(function() {
-    console.log("Products Frontend JS Ready");
+    // ... (eski kodlar: image preview, validation ...)
 
-    // 1. IMAGE PREVIEW HANDLER
-    $(".image-field").on("change", function() {
-        const input = this;
-        const order = $(this).data("order"); // 1, 2, 3...
-        const file = input.files[0];
+    // 3. STATUS CHANGE HANDLER (Yangi qo'shilgan qism)
+    $(".status-select").on("change", async function(e) {
+        const id = $(this).data("id");      // data-id dan ID ni olamiz
+        const status = $(this).val();       // tanlangan status (ACTIVE, PAUSE...)
 
-        if (file) {
-            // Fayl turini tekshirish
-            const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp", "image/avif"];
-            if (!validTypes.includes(file.type)) {
-                alert("Please upload a valid image file (JPG, PNG, WEBP).");
-                $(input).val(""); // Inputni tozalash
-                return;
+        try {
+            // Serverga yuborish
+            const response = await axios.post("/seller/product/status", {
+                id: id,
+                productStatus: status
+            });
+            
+            console.log("Server javobi:", response.data);
+
+            if (response.data.state === "success") {
+                // Muvaffaqiyatli bo'lsa, rangni yangilash (sizdagi funksiya)
+                // Agar updateStatusColor funksiyasi global bo'lsa, o'zi ishlayveradi.
+                // Lekin yaxshisi rangni shu yerda ham yangilab qo'yish mumkin:
+                $(this).removeClass("status-active status-pause status-delete");
+                $(this).addClass(`status-${status.toLowerCase()}`);
+                
+                // Muvaffaqiyatli bo'lgani haqida kichik belgi (Toast)
+                alert("Status updated successfully!"); // Yoki chiroyliroq Toast ishlating
+            } else {
+                alert("Status update failed!");
             }
 
-            // 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                // Rasm manzilini img tegiga o'rnatamiz
-                $(`#preview-${order}`).attr("src", e.target.result);
-                // Stilni o'zgartirish (rasm yuklanganda border yo'qolishi uchun yoki chiroyli bo'lishi uchun)
-                $(`#preview-${order}`).css('padding', '0'); 
-            }
-            reader.readAsDataURL(file);
+        } catch (err) {
+            console.error("Status change error:", err);
+            alert("Internet error or Server unreachable");
         }
     });
 
-    // 2. FORM VALIDATION (Qo'shimcha tekshiruv)
-    $("#addProductForm").on("submit", function(e) {
-        // Agar birinchi rasm yuklanmagan bo'lsa
-        if ($(".image-field[data-order='1']").val() === "") {
-            alert("Main image (first one) is required!");
-            e.preventDefault();
-            return false;
-        }
-        
-        // Boshqa tekshiruvlar HTML 'required' atributi orqali ishlaydi
-        return true;
-    });
 });
+
+// Bu funksiya sizning HTML dagi onchange="updateStatusColor(this)" uchun kerak
+// Lekin biz yuqorida jQuery on('change') ishlatdik.
+// Ikkisi bir vaqtda ishlasa xato bermaydi, lekin jQuery varianti databasega yozadi.
+function updateStatusColor(element) {
+    // Bu funksiya faqat vizual rangni o'zgartiradi
+    const val = element.value.toLowerCase();
+    element.className = `status-select form-select form-select-sm status-${val}`;
+}

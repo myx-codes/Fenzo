@@ -84,22 +84,96 @@ productController.addProduct = async (req: SellerRequest, res: Response) => {
     }
 };
 
-
-productController.updateChosenProduct = async(req: Request, res: Response) => {
-    try{
-        console.log("updateChosenProduct")
-        console.log("reqbody", req.body)
+// 1. Sahifani ochish va ma'lumotni yetkazish
+productController.getUpdateProduct = async (req: Request, res: Response) => {
+    try {
+        console.log("getUpdateProduct");
         const id = req.params.id;
-        console.log("id", id)
+        
+        // Servicedan ID bo'yicha ma'lumotni olamiz
+        const result = await productService.getProduct(id);
 
-        const result = await productService.updateChosenProduct(id, req.body)
-        res.status(HttpCode.OK).json({data: result})
-    }catch(err){
-        console.log("Error , updateChosenProduct", err);
-        if(err instanceof Errors) res.status(err.code).json(err);
-        else res.status(Errors.standard.code).json(Errors.standard); 
+        // productDetail.ejs ga yuboramiz
+        res.render("productDetail", { product: result });
+        
+    } catch (err) {
+        console.log("Error getUpdateProduct:", err);
+        res.redirect("/seller/products");
     }
 };
+
+
+productController.updateChosenProduct = async (req: Request, res: Response) => {
+  try {
+    console.log("updateChosenProduct");
+
+    const id = req.params.id;
+
+    //eski productni olib kelamiz
+    const oldProduct = await productService.getProductById(id);
+
+    // yangi yuklangan rasmlar (agar bo‘lsa)
+    const newImages =
+      req.files && Array.isArray(req.files)
+        ? req.files.map((file: any) => file.path)
+        : [];
+
+    // eski + yangi rasmlarni birlashtiramiz
+    const mergedImages =
+      newImages.length > 0
+        ? [...oldProduct.productImages, ...newImages]
+        : oldProduct.productImages;
+
+    // update uchun input tayyorlaymiz
+    const input: any = {
+      productName: req.body.productName,
+      productDesc: req.body.productDesc,
+      productStatus: req.body.productStatus,
+      productCollection: req.body.productCollection,
+      productType: req.body.productType,
+      productImages: mergedImages,
+    };
+
+    // number maydonlarni alohida tekshirib qo‘shamiz
+    if (req.body.productPrice !== undefined) {
+      input.productPrice = Number(req.body.productPrice);
+    }
+
+    if (req.body.productStock !== undefined) {
+      input.productStock = Number(req.body.productStock);
+    }
+    // update
+    await productService.updateChosenProduct(id, input);
+
+    console.log("Reqbody", req.body)
+    res.redirect("/seller/products");
+
+  } catch (err) {
+    console.log("Error , updateChosenProduct", err);
+    if (err instanceof Errors) res.status(err.code).json(err);
+    else res.status(Errors.standard.code).json(Errors.standard);
+  }
+};
+
+productController.updateProductStatus = async (req: Request, res: Response) => {
+        try {
+            console.log("Status update request:", req.body);
+            const { id, productStatus } = req.body;
+
+            // Servis orqali yangilash
+            const result = await productService.updateProductStatus(id, productStatus);
+
+            // Frontga "OK" deb javob qaytarish (muhim!)
+            res.json({ state: "success", data: result });
+        } catch (err) {
+            console.log("ERROR updateProductStatus:", err);
+            if (err instanceof Errors) res.status(err.code).json(err);
+            else res.status(Errors.standard.code).json(Errors.standard);
+        }
+    };
+
+
+
 
 
 // SSR APIs

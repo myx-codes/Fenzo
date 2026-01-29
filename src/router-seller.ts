@@ -4,6 +4,7 @@ import sellerController from './controllers/seller.controller';
 import productController from './controllers/product.controller';
 import ordersController from './controllers/orders.controller';
 import makeuploader from "./libs/utils/uploader";
+import makeUploader from './libs/utils/uploader';
 
 const routerSeller = express.Router();
 
@@ -39,10 +40,27 @@ routerSeller
     makeuploader("products").array("productImages", 5),
     productController.addProduct)
 
+routerSeller
+.get("/product/update/:id",
+    sellerController.verifySeller,
+    productController.getUpdateProduct)
+.post("/product/update/:id",
+    sellerController.verifySeller,
+    makeUploader("products").array("productImages", 5), 
+    productController.updateChosenProduct)
+.post("/product/status",
+    sellerController.verifySeller, 
+    productController.updateProductStatus);
 
 routerSeller
 .post("/customer/update", sellerController.updateChosenUser)
-.post("/product/:id", productController.updateChosenProduct)
+.get("/settings", 
+    sellerController.verifySeller,
+    sellerController.getSellerSettings)
+.post("/settings/update",
+    sellerController.verifySeller,
+    makeuploader("users").single("userImage"),   
+    sellerController.updateSellerSettings )
 
 
 export default routerSeller;

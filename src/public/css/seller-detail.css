@@ -1,0 +1,57 @@
+/* Umumiy Card stillari */
+.profile-card-box, .form-card-box {
+    border-radius: 12px;
+    background-color: #fff;
+    overflow: hidden;
+}
+
+/* Rasm joylashuvi */
+.profile-img-wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+}
+
+/* Rasmning o'zi */
+#profilePreview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Kamera iconkasi (Upload button) */
+.btn-upload-icon {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 36px;
+    height: 36px;
+    background-color: #212529; /* Dark button */
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid #fff;
+}
+
+.btn-upload-icon:hover {
+    background-color: #404040;
+    transform: scale(1.1);
+}
+
+/* Form inputlari */
+.form-control:focus {
+    box-shadow: none;
+    border-color: #212529;
+}
+
+.form-label {
+    font-size: 0.9rem;
+    color: #4b5563;
+}

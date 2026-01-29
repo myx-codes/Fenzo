@@ -31,12 +31,12 @@
         <div class="header-right">
             
             <% if (typeof showAddButton !== 'undefined' && showAddButton) { %>
-                <a href="/seller/add-product" class="btn-action">
+                <a href="/seller/product/add" class="btn-action">
                     <i class="fa-solid fa-plus me-2"></i> Add Product
                 </a>
             <% } %>
 
-            <div class="profile-card">
+            <a href="/seller/settings" class="profile-card text-decoration-none" title="Edit Profile">
                 
                 <div class="profile-avatar">
                     <% if (user && user.userImage) { %>
@@ -50,7 +50,7 @@
                     <span class="profile-name"><%= user.userNick %></span>
                     <span class="profile-role">Seller Account</span>
                 </div>
-            </div>
+            </a>
 
             <a href="/seller/logout" class="btn-logout" title="Chiqish">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>

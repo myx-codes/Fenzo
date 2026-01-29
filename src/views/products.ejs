@@ -134,12 +134,13 @@
                                         onchange="updateStatusColor(this)">
                                     <option value="ACTIVE" <%= ele.productStatus === 'ACTIVE' ? 'selected' : '' %>>ACTIVE</option>
                                     <option value="PAUSE" <%= ele.productStatus === 'PAUSE' ? 'selected' : '' %>>PAUSE</option>
-                                    <option value="DELETE" <%= ele.productStatus === 'DELETE' ? 'selected' : '' %>>DELETE</option>
+                                    <option value="OUT_OF_STOCK" <%= ele.productStatus === 'OUT_OF_STOCK' ? 'selected' : '' %>>SOLDOUT</option>
+                                    <option value="ARCHIVED" <%= ele.productStatus === 'ARCHIVED' ? 'selected' : '' %>>ARCHIVED</option>
                                 </select>
                             </td>
 
-                            <td class="text-end pe-4">
-                                <a href="/seller/product/update/<%= ele._id %>" class="btn btn-sm btn-light border text-muted">
+                            <td class="text-end pe-4" method="GET">
+                                <a href="/seller/product/update/<%= ele._id %>" class="btn btn-sm btn-light border">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
                             </td>

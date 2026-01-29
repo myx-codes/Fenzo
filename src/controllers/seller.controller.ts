@@ -1,7 +1,7 @@
 import { Errors, HttpCode, Message } from "../libs/Errors";
 import { T } from "../libs/types/common";
 import { NextFunction, Request, Response } from "express"
-import { CustomerInQuery, LoginInput, UserInput } from "../libs/types/user";
+import { CustomerInQuery, LoginInput, UserInput, UserUpdateInput } from "../libs/types/user";
 import { UserStatus, UserType } from "../libs/enums/user.enums";
 import SellerService from "../models/Seller.service";
 import { SellerRequest } from "../libs/types/user";
@@ -209,6 +209,66 @@ sellerController.verifySeller = (
             return next();
         }else 
             return res.status(401).send(`<script> alert("${Message.NOT_AUTHENTICATED}"); window.location.replace('/seller/login')</script>`)
+};
+
+
+sellerController.getSellerSettings = async (req: Request, res: Response) => {
+        try {
+            console.log("getSellerSettings ishladi");
+            
+            // ID ni sessiyadan olamiz (URL dan emas!)
+            const id = req.session.user?._id;
+            if (!id) return res.redirect("/seller/login"); // Agar user bo'lmasa login ga
+
+            // Service orqali toza ma'lumotni olamiz
+            const data = await sellerService.getSellerSettings(id);
+
+            // EJS ga 'user' nomi bilan yuboramiz
+            res.render("sellerDetail", { user: data });
+        } catch (err) {
+            console.log("Error getSellerSettings:", err);
+            res.redirect("/seller/dashboard");
+        }
+    };
+
+
+    sellerController.updateSellerSettings = async (req: Request, res: Response) => {
+        try {
+            console.log("updateSellerSettings ishladi");
+            
+            const id = req.session.user?._id;
+            if (!id) return res.redirect("/seller/login");
+
+            const input: UserInput = req.body; // Formadagi text inputlar (nick, phone, desc)
+
+            // Agar rasm yuklangan bo'lsa, uni inputga qo'shamiz
+            if (req.file) {
+                // Windows slashlarini to'g'irlash
+                input.userImage = req.file.path.replace(/\\/g, "/");
+            }
+
+            // 1-qadam: Bazani yangilash
+            const updatedUser = await sellerService.updateSellerSettings(id, input);
+
+            // 2-qadam: Sessiyani yangilash (MUHIM!)
+            // Agar buni qilmasangiz, page refresh bo'lsa ham eski rasm/ism turaveradi (headerda)
+            req.session.user = updatedUser;
+
+            // 3-qadam: Saqlash va qaytish
+            req.session.save(function (err) {
+                if (err) console.log("Session save error:", err);
+                // Muvaffaqiyatli bo'lsa yana settingsga qaytamiz
+                res.redirect("/seller/dashboard");
+            });
+
+        } catch (err) {
+            console.log("Error updateSellerSettings:", err);
+            // Xato bo'lsa ham settingsga qaytamiz (xabar chiqarish mumkin)
+            res.redirect("/seller/settings");
+        }
     }
+
+
+
 
 export default sellerController;

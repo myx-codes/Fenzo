@@ -26,7 +26,8 @@ export enum Message {
     REMOVE_FAILED = "Remove operation failed!",
     UPLOAD_FAILED = "Image upload failed!",
     PROVIDE_ALLOWED_FORMAT = "Please provide valid image format (jpg, jpeg, png)!",
-    NOT_ALLOWED = "NOT_ALLOWED"
+    NOT_ALLOWED = "NOT_ALLOWED",
+    NOT_FOUND = "NOT_FOUND"
 }
 
 export class Errors extends Error {

@@ -85,6 +85,28 @@ class SellerService{
     }
   };
 
+  public async getSellerSettings(id: string) {
+        const user = await this.userModel.findById(id).lean();
+        if (!user) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+        return user;
+    }
+
+
+  public async updateSellerSettings(id: string, input: UserInput) {
+        
+        // Inputlarni tozalash
+        if(input.userNick) input.userNick = input.userNick.trim();
+        // Boshqa validatsiyalar...
+
+        const result = await this.userModel.findByIdAndUpdate(id, input, {
+            new: true // Yangilangan versiyani qaytaradi
+        }).lean();
+
+        if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+
+        return result;
+    }
+
 
   public async processLogin(input: LoginInput): Promise<User>{
     const user = await this.userModel.findOne(

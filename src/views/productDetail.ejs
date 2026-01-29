@@ -1,0 +1,153 @@
+<%- include('includes/header') %>
+<link rel="stylesheet" href="/css/products.css">
+
+<div class="container py-5">
+    <%- include('includes/dashboard-header', { activeTab: 'products', user: user }) %>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold m-0 text-dark">Edit Product Details</h4>
+                <a href="/seller/products" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Back to List
+                </a>
+            </div>
+
+            <div class="panel p-4 p-md-5">
+                
+                <% if(product.productImages && product.productImages.length > 0) { %>
+                    <div id="productGallery" class="carousel slide product-carousel mb-5" data-bs-ride="carousel">
+                        
+                        <div class="carousel-indicators">
+                            <% product.productImages.forEach((img, index) => { %>
+                                <button type="button" data-bs-target="#productGallery" data-bs-slide-to="<%= index %>" 
+                                    class="<%= index === 0 ? 'active' : '' %>" aria-current="true"></button>
+                            <% }) %>
+                        </div>
+
+                        <div class="carousel-inner">
+                            <% product.productImages.forEach((img, index) => { %>
+                                <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                                    <img src="/<%= img %>" 
+                                        class="d-block w-100" 
+                                        alt="Product Image" 
+                                        id="carousel-img-<%= index + 1 %>">
+                                </div>
+                            <% }) %>
+                        </div>
+
+                        <% if(product.productImages.length > 1) { %>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#productGallery" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#productGallery" data-bs-slide="next">
+                                <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                            </button>
+                        <% } %>
+                    </div>
+                <% } %>
+
+
+                <form action="/seller/product/update/<%= product._id %>" method="POST" enctype="multipart/form-data">
+                    <div class="row g-4">
+                        
+                        <div class="col-12">
+                            <label class="form-label">Update Images</label>
+                            <div class="image-upload-container">
+                                <% for(let i = 0; i < 5; i++) { 
+                                    let currentImg = (product.productImages && product.productImages[i]) ? "/" + product.productImages[i] : "/img/upload.svg";
+                                    let isExisting = (product.productImages && product.productImages[i]);
+                                %>
+                                    <div class="upload-box shadow-sm" title="Click to change image">
+                                        <img src="<%= currentImg %>" id="preview-<%= i+1 %>" 
+                                            class="<%= isExisting ? 'p-0' : 'p-3' %>"
+                                            <% if (isExisting) { %>style="object-fit: cover;"<% } else { %>style="object-fit: contain;"<% } %>>
+                                        
+                                        <input type="file" name="productImages" class="image-field" data-order="<%= i+1 %>">
+                                    </div>
+                                <% } %>
+                            </div>
+                            <small class="text-muted d-block mt-2 text-center" style="font-size: 12px;">
+                                Click on an image to replace it. Only new files will be uploaded.
+                            </small>
+                        </div>
+                        
+                        <div class="col-12"><hr class="text-muted opacity-25"></div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Product Name</label>
+                            <input type="text" name="productName" class="form-control" value="<%= product.productName %>" required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Price</label>
+                            <input type="number" name="productPrice" class="form-control" value="<%= product.productPrice %>" required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Stock</label>
+                            <input type="number" name="productStock" class="form-control" value="<%= product.productStock %>" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Collection</label>
+                            <select name="productCollection" class="form-select" required>
+                                <option value="CLOTHING" <%= product.productCollection === 'CLOTHING' ? 'selected' : '' %>>Clothing</option>
+                                <option value="PARFUM" <%= product.productCollection === 'PARFUM' ? 'selected' : '' %>>Parfum</option>
+                                <option value="COSMETICS" <%= product.productCollection === 'COSMETICS' ? 'selected' : '' %>>Cosmetics</option>
+                                <option value="BODY_CARE" <%= product.productCollection === 'BODY_CARE' ? 'selected' : '' %>>Body Care</option>
+                                <option value="VITAMINS" <%= product.productCollection === 'VITAMINS' ? 'selected' : '' %>>Vitamins</option>
+                                <option value="ELECTRONICS" <%= product.productCollection === 'ELECTRONICS' ? 'selected' : '' %>>Electronics</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Product Type</label>
+                            <select name="productType" class="form-select" required>
+                                <option value="PHYSICAL" <%= product.productType === 'PHYSICAL' ? 'selected' : '' %>>Physical</option>
+                                <option value="DIGITAL" <%= product.productType === 'DIGITAL' ? 'selected' : '' %>>Digital</option>
+                                <option value="SET" <%= product.productType === 'SET' ? 'selected' : '' %>>Set</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Gender</label>
+                            <select name="productGender" class="form-select" required>
+                                <option value="MALE" <%= product.productGender === 'MALE' ? 'selected' : '' %>>Male</option>
+                                <option value="FEMALE" <%= product.productGender === 'FEMALE' ? 'selected' : '' %>>Female</option>
+                                <option value="UNISEX" <%= product.productGender === 'UNISEX' ? 'selected' : '' %>>Unisex</option>
+                                <option value="KIDS" <%= product.productGender === 'KIDS' ? 'selected' : '' %>>Kids</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Unit</label>
+                            <select name="productUnit" class="form-select" required>
+                                <option value="PIECE" <%= product.productUnit === 'PIECE' ? 'selected' : '' %>>Piece</option>
+                                <option value="PACK" <%= product.productUnit === 'PACK' ? 'selected' : '' %>>Pack</option>
+                                <option value="SET" <%= product.productUnit === 'SET' ? 'selected' : '' %>>Set</option>
+                                <option value="KG" <%= product.productUnit === 'KG' ? 'selected' : '' %>>Kg</option>
+                                <option value="LITRE" <%= product.productUnit === 'LITRE' ? 'selected' : '' %>>Litre</option>
+                                <option value="ML" <%= product.productUnit === 'ML' ? 'selected' : '' %>>Ml</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea name="productDesc" class="form-control" rows="4" required><%= product.productDesc %></textarea>
+                        </div>
+
+                        <div class="col-12 mt-4 text-end">
+                            <button href="/seller/product/update/:id" type="submit" class="btn btn-outline-dark  fw-bold px-5">Save Changes</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/products.js"></script>
+<%- include('includes/footer') %>

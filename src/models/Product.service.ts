@@ -62,15 +62,39 @@ class ProductService {
         const total = result[0].metaData.length > 0 ? result[0].metaData[0].total : 0;
 
         return { products, total };
+    };
+
+
+    public async getProduct(id: string): Promise<Product> {
+        const result = await this.productModel.findById(id).lean();
+        if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+        return result as unknown as Product;
+    }
+
+
+    public async getProductById(id: string): Promise<Product> {
+        const product = await this.productModel.findById(id);
+        if (!product) throw new Errors(HttpCode.NOT_FOUND, Message.NOT_FOUND);
+        return product.toObject() as Product;
     }
 
 
 
-    public async updateChosenProduct(id: string,input: ProductUpdateInput): Promise<Product>{
-        id = shapeIntoMongooseObjectId(id);
-        const result = await this.productModel.findByIdAndUpdate({_id:id}, input, {new: true}).lean<Product>().exec();
-        if(!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
-        return result
+
+    public async updateChosenProduct(id: string, input: any): Promise<Product> {
+        // id orqali topib, input ma'lumotlarini yangilaydi
+        // { new: true } -> yangilangan ma'lumotni qaytaradi
+        const result = await this.productModel.findByIdAndUpdate(id, input, { new: true });
+        
+        if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.UPDATE_FAILED);
+        return result.toObject() as Product;
+    }
+
+    public async updateProductStatus(id: string, status: string): Promise<any> {
+        // Status enum ekanligini tekshirish (ixtiyoriy)
+        // const search: ProductInput = { productStatus: status }; 
+        
+        return await ProductModel.findByIdAndUpdate(id, { productStatus: status }, { new: true });
     }
 
 

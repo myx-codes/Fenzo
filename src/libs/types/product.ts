@@ -16,7 +16,7 @@ export interface Product {
     productDesc: string;
     productPrice: number;
     productDiscountPrice: number; // Yangi qo'shildi
-    productStock: number;         // productLeftCount o'rniga
+    productStock: number;         // productStock o'rniga
     productUnit: ProductUnit;
     productGender: ProductGender;
     productImages: string[];
@@ -48,7 +48,7 @@ export interface ProductUpdateInput {
     productType?: ProductType;
     productName?: string;
     productPrice?: number;
-    productLeftCount?: number;
+    productStock?: number;
     productDesc?: string;
     productImages?: string[];
 }

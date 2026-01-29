@@ -1,0 +1,84 @@
+<%- include('includes/header') %>
+<link rel="stylesheet" href="/css/seller-detail.css">
+
+<div class="container py-5">
+    
+    <%- include('includes/dashboard-header', { activeTab: 'settings', user: user }) %>
+
+    <div class="row justify-content-center">
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card profile-card-box shadow-sm border-0">
+                <div class="card-body text-center p-4">
+                    <form action="/seller/settings/update" method="POST" enctype="multipart/form-data" id="sellerForm">
+                        
+                        <div class="profile-img-wrapper mb-3">
+                            <img src="<%= user.userImage ? '/' + user.userImage : '/img/default_user.svg' %>" 
+                                 alt="Profile Image" 
+                                 id="profilePreview" 
+                                 class="img-fluid rounded-circle shadow-sm">
+                            
+                            <label for="fileUpload" class="btn-upload-icon">
+                                <i class="fa-solid fa-camera"></i>
+                            </label>
+                            <input type="file" id="fileUpload" name="userImage" class="d-none" accept="image/*">
+                        </div>
+
+                        <h5 class="fw-bold mb-1"><%= user.userNick %></h5>
+                        <p class="text-muted mb-3"><%= user.userType %></p>
+                        
+                        <div class="status-badge mb-3">
+                            <span class="badge bg-<%= user.userStatus === 'ACTIVE' ? 'success' : 'danger' %>">
+                                <%= user.userStatus %>
+                            </span>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card form-card-box shadow-sm border-0">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-user-pen me-2"></i>Edit Profile Details</h5>
+                </div>
+                <div class="card-body p-4">
+                    
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Brand / Nick Name</label>
+                                <input type="text" name="userNick" class="form-control" value="<%= user.userNick %>" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Phone Number</label>
+                                <input type="text" name="userPhone" class="form-control" value="<%= user.userPhone %>" required>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Email Address</label>
+                                <input type="email" class="form-control bg-light" value="Sizning email manzilingiz (himoyalangan)" readonly disabled>
+                                <small class="text-muted">Contact support to change email.</small>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Description / Bio</label>
+                                <textarea name="userDesc" class="form-control" rows="4" placeholder="Tell customers about your shop..."><%= user.userDesc %></textarea>
+                            </div>
+
+                            <div class="col-12 mt-4">
+                                <hr class="text-muted opacity-25">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="/seller/dashboard" class="btn btn-light border">Cancel</a>
+                                    <button type="submit" class="btn btn-dark px-4 fw-bold">Save Changes</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/seller.js"></script>
+<%- include('includes/footer') %>
