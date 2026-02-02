@@ -3,7 +3,7 @@ import { T } from '../libs/types/common';
 import ProductService from "../models/Product.service";
 import { Errors, HttpCode, Message } from "../libs/Errors";
 import { SellerRequest } from "../libs/types/user";
-import { ProductInput} from "../libs/types/product";
+import { ProductInput, ProductInquiry} from "../libs/types/product";
 import { ProductCollection } from "../libs/enums/product.enums";
 
 const productController: T = {};
@@ -186,6 +186,29 @@ productController.updateProductStatus = async (req: Request, res: Response) => {
 
 
 // SSR APIs
+productController.getProducts = async (req: Request, res: Response) => {
+    console.log("getProducts");
+    console.log("req.body:", req.body)
+    try{
+        const { page, limit, order, productCollection, search } = req.query;
+        const inquiry: ProductInquiry = {
+            order: String(order),
+            page: Number(page),
+            limit: Number(limit)
+        }
+
+        if(productCollection)
+            inquiry.productCollection = productCollection as ProductCollection;
+        if(search)
+            inquiry.search = String(search);
+
+        const result = await productService.getAllProducts(inquiry);
+        res.send(result)
+
+    }catch(err){
+        console.log("Error getProducts")
+    }
+}
 
 
 export default productController

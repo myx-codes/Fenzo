@@ -42,9 +42,9 @@ $(function() {
 
         if (file) {
             // Fayl formati tekshiruvi
-            const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+            const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp", "image/avif"];
             if (!validTypes.includes(file.type)) {
-                alert("Please upload a valid image (JPG, PNG, WEBP).");
+                alert("Please upload a valid image (JPG, PNG, WEBP, AVIF).");
                 $(input).val(""); // Xato bo'lsa inputni tozalaymiz
                 return;
             }
