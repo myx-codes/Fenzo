@@ -17,7 +17,7 @@ export interface Order {
     orderTotal: number;
     orderDelivery: number;
     orderStatus: OrderStatus;
-    memberId: ObjectId;
+    userId: ObjectId;
     createdAt: Date;
     updatedAt: Date;
     

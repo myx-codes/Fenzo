@@ -22,4 +22,10 @@ router
     userController.retrieveAuth,
     productController.getProduct)
 
+// Order
+router
+.post("/order/create",
+    userController.verifyAuth,
+    ordersController.createOrder)
+
 export default router;
