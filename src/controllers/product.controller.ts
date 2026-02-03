@@ -211,27 +211,17 @@ productController.getProducts = async (req: Request, res: Response) => {
     }
 };
 
-productController.getProduct = async(req: ExtendedRequest, res: Response) => {
-    try {
-        console.log("getProduct ishladi");
-        const { id } = req.params;
-        const userId = req.user?._id ?? null;
-
+productController.getProduct = async(req: ExtendedRequest, res:Response) => {
+    console.log("getProduct");
+    try{
+        const {id} = req.params;
+        console.log("req.body", req.body);
+        const userId = req.user?._id?? null
         const result = await productService.getProduct(userId, id);
 
-        // Muvaffaqiyatli javob
-        res.status(200).json(result); 
-
-    } catch (err) {
-        // Xatoni to'liq ko'rsatish (Console da nima xato bo'lganini bilish uchun)
-        console.log("Error getProduct:", err);
-
-        // 🚨 MUHIM: Xato bo'lsa ham javob qaytarish shart! Bo'lmasa qotib qoladi.
-        if (err instanceof Errors) {
-             res.status(err.code).json(err);
-        } else {
-             res.status(500).json({ message: "Internal Server Error" });
-        }
+        res.send(result)
+    }catch{
+        console.log("Error getProduct")
     }
 };
 
