@@ -3,9 +3,11 @@ import path from 'path';
 import router from './router';
 import routerSeller from './router-seller'
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import { MORGAN_FORMAT } from './libs/config';
 import session from 'express-session';
 import ConnectMongoDB from "connect-mongodb-session"
+
 
 declare module 'express-session' {
   interface SessionData {
@@ -26,6 +28,7 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan(MORGAN_FORMAT))
+app.use(cookieParser());
 
 // Sessions
 app.use(

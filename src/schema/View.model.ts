@@ -10,7 +10,7 @@ const viewSchema = new Schema(
     required: true
 },
 
-memberId: {
+userId: {
     type: Schema.Types.ObjectId,
     required: true,
     ref: "User"
