@@ -73,6 +73,19 @@ userController.login = async (req: Request, res: Response) => {
     }
 };
 
+userController.logout = async ( req: ExtendedRequest, res: Response) => {
+    try{
+        console.log("Customer, logout");
+        res.cookie("accessToken", null, {maxAge: 0, httpOnly: true});
+        res.status(HttpCode.OK).json({logout: true});
+    }catch(err){
+        console.log("Error Customer, Logout", err);
+        if(err instanceof Errors)res.status(err.code).json(err);
+        else res.status(Errors.standard.code).json(Errors.standard);
+    }
+
+}
+
 
 userController.verifyAuth = async( req: ExtendedRequest, res: Response, next: NextFunction) => {
     try{

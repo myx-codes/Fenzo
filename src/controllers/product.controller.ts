@@ -85,7 +85,6 @@ productController.addProduct = async (req: SellerRequest, res: Response) => {
     }
 };
 
-// 1. Sahifani ochish va ma'lumotni yetkazish
 productController.getUpdateProduct = async (req: Request, res: Response) => {
     try {
         console.log("getUpdateProduct");
@@ -182,9 +181,7 @@ productController.updateProductStatus = async (req: Request, res: Response) => {
         }
     };
 
-
-
-
+    
 
 // SSR APIs
 productController.getProducts = async (req: Request, res: Response) => {

@@ -12,7 +12,7 @@ router.get('/customer/sellers', userController.getSellers);
 // Auth Routers
 router.post("/auth/signup", userController.signup);
 router.post("/auth/login", userController.login);
-// router.post("/auth/logout", userController.logout);
+router.post("/auth/logout", userController.logout);
 
 
 // Product

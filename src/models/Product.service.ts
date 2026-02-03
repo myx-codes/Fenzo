@@ -104,6 +104,7 @@ class ProductService {
         
         return await ProductModel.findByIdAndUpdate(id, { productStatus: status }, { new: true });
     };
+    
 
 
     // SSR APIs
@@ -159,12 +160,10 @@ class ProductService {
             }
         }
         return result;
-    }
+    };
 
-
-
-    
-}
+  
+};
 
 
 export default ProductService
