@@ -18,5 +18,6 @@ router.post("/auth/login", userController.login);
 // Product
 router
 .get("/customer/products", productController.getProducts)
+.get("/customer/product/:id", productController.getProduct)
 
 export default router;

@@ -4,11 +4,19 @@ import { Errors, HttpCode, Message } from "../libs/Errors"
 import { Product, ProductInput, ProductInquiry, ProductUpdateInput } from "../libs/types/product"
 import ProductModel from "../schema/Product.model"
 import { T } from "../libs/types/common"
+import { ObjectId, Types } from "mongoose"
+import { ViewInput } from "../libs/types/view"
+import { ViewGroup } from "../libs/enums/view.enums"
+import ViewModel from "../schema/View.model"
+import ViewService from "./View.service"
 
 class ProductService {
-    private readonly productModel
+    private readonly productModel;
+    public viewService;
+
     constructor(){
-        this.productModel = ProductModel
+        this.productModel = ProductModel;
+        this.viewService = new ViewService()
     };
      
     // BSSR APIs
@@ -67,7 +75,7 @@ class ProductService {
     };
 
 
-    public async getProduct(id: string): Promise<Product> {
+    public async getProductDetail(id: string): Promise<Product> {
         const result = await this.productModel.findById(id).lean();
         if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
         return result as unknown as Product;
@@ -119,8 +127,43 @@ class ProductService {
         ]).exec();
         if(!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
         return result
+    };
+
+    public async getProduct(userId: Types.ObjectId | null, id: string): Promise<Product>{
+        const productId = shapeIntoMongooseObjectId(id);
+        console.log("userId", userId);
+
+        let result =  await this.productModel.findOne({_id: productId, productStatus: ProductStatus.ACTIVE}).lean<Product>().exec();
+        if(!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_PRODUCT_FOUND);
+
+        if(userId){
+            const input: ViewInput = {
+                userId: userId,
+                viewRefId: productId,
+                viewGroup: ViewGroup.PRODUCT,
+            }
+            console.log("userId", userId);
+
+            const existView = await this.viewService.checkViewExistance(input);
+
+            console.log("exist", !! existView);
+            if(!existView){
+                await this.viewService.insertUserView(input);
+
+
+            const result2 = await this.productModel.findByIdAndUpdate(
+                productId,
+                {$inc:{productViews: 1}},
+                {new: true}
+            )
+            }
+        }
+        return result;
     }
 
+
+
+    
 }
 
 

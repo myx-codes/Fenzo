@@ -2,9 +2,10 @@ import { Request, Response } from "express";
 import { T } from '../libs/types/common';
 import ProductService from "../models/Product.service";
 import { Errors, HttpCode, Message } from "../libs/Errors";
-import { SellerRequest } from "../libs/types/user";
+import { ExtendedRequest, SellerRequest } from "../libs/types/user";
 import { ProductInput, ProductInquiry} from "../libs/types/product";
 import { ProductCollection } from "../libs/enums/product.enums";
+import { constrainedMemory } from "process";
 
 const productController: T = {};
 const productService = new ProductService()
@@ -91,7 +92,7 @@ productController.getUpdateProduct = async (req: Request, res: Response) => {
         const id = req.params.id;
         
         // Servicedan ID bo'yicha ma'lumotni olamiz
-        const result = await productService.getProduct(id);
+        const result = await productService.getProductDetail(id);
 
         // productDetail.ejs ga yuboramiz
         res.render("productDetail", { product: result });
@@ -208,7 +209,21 @@ productController.getProducts = async (req: Request, res: Response) => {
     }catch(err){
         console.log("Error getProducts")
     }
-}
+};
+
+productController.getProduct = async(req: ExtendedRequest, res:Response) => {
+    console.log("getProduct");
+    try{
+        const {id} = req.params;
+        console.log("req.body", req.body);
+        const userId = req.user?._id
+        const result = await productService.getProduct(userId, id);
+
+        res.send(result)
+    }catch{
+        console.log("Error getProduct")
+    }
+};
 
 
 export default productController

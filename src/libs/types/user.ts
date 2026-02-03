@@ -43,9 +43,9 @@ export interface UserUpdateInput {
 }
 
 export interface ExtendedRequest extends Request {
-    user?: User;
-    file?: Express.Multer.File;
-    files?: Express.Multer.File[];
+    user: User;
+    file: Express.Multer.File;
+    files: Express.Multer.File[];
 }
 
 export interface SellerRequest extends Request {
