@@ -56,6 +56,35 @@ ordersController.updateOrder = async (req: ExtendedRequest, res: Response) => {
         if(err instanceof Errors)res.status(Errors.standard.code).json(err);
         else res.status(Errors.standard.code).json(Errors.standard);
     }
-}
+};
+
+// BSSR APIs
+ordersController.getOrders = async (req: ExtendedRequest, res: Response) => {
+    try {
+        console.log("getOrders");
+        // Querydan parametrlarni olamiz
+        const { page, limit, orderStatus } = req.query;
+        
+        const inquiry: OrderInquery = {
+            page: Number(page),
+            limit: Number(limit),
+            orderStatus: orderStatus as OrderStatus,
+        };
+
+        console.log("inquiry", inquiry);
+
+        // Service funksiyasini chaqiramiz (nomini getOrders qildik)
+        const result = await orderService.getOrders(req.user, inquiry);
+        console.log("getOrders Result:", JSON.stringify(result, null, 2));
+        
+
+        // ✅ O'zgarish: Ma'lumot olishda 200 (OK) ishlatiladi
+        res.status(HttpCode.OK).json(result);
+    } catch (err) {
+        console.log("Error getOrders", err);
+        if (err instanceof Errors) res.status(err.code).json(err);
+        else res.status(Errors.standard.code).json(Errors.standard);
+    }
+};
 
 export default ordersController

@@ -36,7 +36,7 @@ export interface OrderItemInput {
 export interface OrderInquery {
   page: number;
   limit: number;
-  orderStatus: OrderStatus
+  orderStatus: OrderStatus | string;
 }
 
 export interface OrderUpdateInput {

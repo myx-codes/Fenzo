@@ -24,7 +24,7 @@ routerSeller
 .get("/customers", sellerController.getCustomers)
 .get("/check-me", sellerController.checkAuthSession)
 
-
+// Product
 routerSeller
 .get("/products", 
     sellerController.verifySeller, 
@@ -61,6 +61,12 @@ routerSeller
     sellerController.verifySeller,
     makeuploader("users").single("userImage"),   
     sellerController.updateSellerSettings )
+
+// Order
+routerSeller
+.get("/orders", 
+    sellerController.verifySeller, 
+    ordersController.getOrders)
 
 
 export default routerSeller;
