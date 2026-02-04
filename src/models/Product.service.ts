@@ -20,15 +20,27 @@ class ProductService {
     };
      
     // BSSR APIs
-    public async addProduct(input: ProductInput): Promise<Product>{
-        try{
-            const result = await this.productModel.create(input)
-            return result.toObject() as Product
-        }catch(err){
-            console.log("Error, Service.model addProduct", err);
-            throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
-        }
-    };
+public async addProduct(input: ProductInput): Promise<Product> {
+  try {
+    const result = await this.productModel.create(input);
+
+    const product = result.toObject();
+
+    console.log("PRODUCT CREATED (DB RESULT):", {
+      _id: product._id,
+      userId: product.userId,
+      productName: product.productName
+    });
+
+    return product as Product;
+
+  } catch (err) {
+    console.log("Error, Service.model addProduct", err);
+    throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
+  }
+}
+
+
 
 
     public async getAllProducts(inquiry: ProductInquiry) {
@@ -44,10 +56,25 @@ class ProductService {
         }
 
         // 2. Sort (Tartiblash) yasash
-        let sort: any = { createdAt: -1 }; // Default: Yangilari tepada
-        if (inquiry.order === "price_low") sort = { productPrice: 1 };
-        if (inquiry.order === "price_high") sort = { productPrice: -1 };
-        if (inquiry.order === "new") sort = { createdAt: -1 };
+        let sort: Record<string, 1 | -1>;
+            switch (inquiry.order) {
+            case "PRICE_ASC":
+                sort = { productPrice: 1 };
+                break;
+
+            case "PRICE_DESC":
+                sort = { productPrice: -1 };
+                break;
+
+            case "TOP_RATED":
+                sort = { productRating: -1 };
+                break;
+
+            case "NEWEST":
+            default:
+                sort = { createdAt: -1 };
+            }
+
 
         // 3. Aggregation
         const result = await this.productModel.aggregate([
@@ -108,27 +135,56 @@ class ProductService {
 
 
     // SSR APIs
-    public async getProducts(inquiry: ProductInquiry): Promise<Product[]>{
-        const match: T = {productStatus: ProductStatus.ACTIVE};
-        if(inquiry.productCollection)
-            match.productCollection = inquiry.productCollection;
-        if(inquiry.search){
-            match.productName = { $regex: new RegExp(inquiry.search, "i")}
-        }
+    public async getProducts(inquiry: ProductInquiry): Promise<Product[]> {
+  const match: any = { productStatus: ProductStatus.ACTIVE };
 
-        const sort: T = inquiry.order === "productPrice"
-        ? {[inquiry.order]: 1}
-        : {[inquiry.order]: -1};
+  if (inquiry.productCollection) {
+    match.productCollection = inquiry.productCollection;
+  }
 
-        const result = await this.productModel.aggregate([
-            {$match: match},
-            {$sort: sort},
-            {$skip: (inquiry.page * 1 - 1) * inquiry.limit},
-            {$limit: inquiry.limit * 1}
-        ]).exec();
-        if(!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
-        return result
-    };
+  if (inquiry.search) {
+    match.productName = { $regex: new RegExp(inquiry.search, "i") };
+  }
+
+  // ✅ SORT LOGIC (ENUM asosida)
+  let sort: any;
+
+  switch (inquiry.order) {
+    case "PRICE_ASC":
+      sort = { productPrice: 1 };
+      break;
+
+    case "PRICE_DESC":
+      sort = { productPrice: -1 };
+      break;
+
+    case "TOP_RATED":
+      sort = { productRating: -1 };
+      break;
+
+    case "NEWEST":
+    default:
+      sort = { createdAt: -1 };
+  }
+
+  const page = Number(inquiry.page) || 1;
+  const limit = Number(inquiry.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const result = await this.productModel.aggregate([
+    { $match: match },
+    { $sort: sort },
+    { $skip: skip },
+    { $limit: limit }
+  ]).exec();
+
+  if (!result.length) {
+    throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+  }
+
+  return result as Product[];
+}
+
 
     public async getProduct(userId: Types.ObjectId | null, id: string): Promise<Product>{
         const productId = shapeIntoMongooseObjectId(id);

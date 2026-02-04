@@ -23,7 +23,7 @@ class OrderService{
         this.productModel = ProductModel
     }
 
-    public async createOrder(user: User,input: OrderItemInput[]): Promise<Order> {
+public async createOrder(user: User,input: OrderItemInput[]): Promise<Order> {
     const userId = shapeIntoMongooseObjectId(user._id);
     
     // 1. Product'larni bir vaqtda olish (tezlik uchun)
@@ -93,7 +93,7 @@ class OrderService{
     }
 }
 
-    private async updateProductSales(orderId: Types.ObjectId): Promise<void> {
+private async updateProductSales(orderId: Types.ObjectId): Promise<void> {
     // 1. OrderItem'lardan quantity'larni olamiz
     const orderItems = await this.orderItemModel.find({ orderId: orderId });
     
@@ -112,10 +112,7 @@ class OrderService{
 }
 
     
-    public async recordOrderItem(
-    orderId: Types.ObjectId,
-    input: any[] 
-): Promise<void> {
+public async recordOrderItem(orderId: Types.ObjectId,input: any[] ): Promise<void> {
     try {
         // Validation
         if (!input || input.length === 0) {
@@ -143,7 +140,7 @@ class OrderService{
 }
     
 
-    public async getMyOrders(user: User, inquery: OrderInquery): Promise<Order[]>{
+public async getMyOrders(user: User, inquery: OrderInquery): Promise<Order[]>{
         const userId = shapeIntoMongooseObjectId(user._id);
         const matches = {userId: userId, orderStatus: inquery.orderStatus};
 
@@ -173,10 +170,10 @@ class OrderService{
 
         if(!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
         return result
-    };
+};
 
 
-    public async updateOrder(user: User, input: OrderUpdateInput): Promise<Order>{
+public async updateOrder(user: User, input: OrderUpdateInput): Promise<Order>{
         const userId = shapeIntoMongooseObjectId(user._id);
         const orderId = shapeIntoMongooseObjectId(input.orderId);
         let orderStatus = input.orderStatus;
@@ -193,49 +190,185 @@ class OrderService{
             await this.sellerService.addCustomerPoint(user, 1);
         }
         return result.toObject()
-    };
+};
 
 
-    public async getOrders(user: User, inquiry: OrderInquery): Promise<Order[]> {
+public async getOrders(user: User, inquiry: OrderInquery): Promise<any[]> {
+    console.log("getOrders ");
+    
     const userId = shapeIntoMongooseObjectId(user._id);
-    
-    const matches: any = {};
-    
-    // User turiga qarab filter
-    if (user.userType === 'CUSTOMER') {
-        // Customer: faqat o'z order'larini ko'radi
-        matches.userId = userId;
-    } else if (user.userType === 'SELLER') {
-        // Seller: o'z product'larini sotilgan order'larini ko'radi
-        // Buning uchun orderItems orqali filter qilish kerak
-        // Bu yerdan keyin alohida aggregation qilish kerak
+    const page = Math.max(1, inquiry.page || 1);
+    const limit = Math.max(1, Math.min(inquiry.limit || 10, 100));
+
+
+    try {
+        const allProductsCount = await this.productModel.countDocuments({});
+        console.log("Total products in DB:", allProductsCount);
+        
+        const sampleProducts = await this.productModel.find({}).limit(3);
+        console.log("Sample products:", sampleProducts.map(p => ({
+            _id: p._id,
+            productName: p.productName,
+            userId: userId,
+            userIdType: typeof userId,
+            userIdString: userId?.toString()
+        })));
+    } catch (err) {
+        console.log("ERROR getting products:", err);
     }
     
-    // Status filter
+    const sellerProducts = await this.productModel.find({ 
+        userId: userId 
+    });
+
+    sellerProducts.forEach((p, i) => {
+        console.log(`Product ${i + 1}:`, {
+            _id: p._id,
+            productName: p.productName,
+            userId: userId,
+            userIdEquals: userId?.toString() === userId.toString()
+        });
+    });
+
+    const matches: any = {};
+
+    if (user.userType === 'CUSTOMER') {
+        matches.userId = userId;
+    } else if (user.userType === 'SELLER') {
+        if (sellerProducts.length > 0) {
+            const myProductIds = sellerProducts.map((ele) => ele._id);
+     
+            const myOrderItems = await this.orderItemModel.find({
+                productId: { $in: myProductIds }
+            });
+            myOrderItems.forEach((item, i) => {
+                console.log(`OrderItem ${i + 1}:`, {
+                    _id: item._id,
+                    orderId: item.orderId,
+                    productId: item.productId
+                });
+            });
+            
+            const myOrderIds = [...new Set(myOrderItems.map((ele) => ele.orderId))];
+            
+            if (myOrderIds.length > 0) {
+                matches._id = { $in: myOrderIds };
+            } else {
+                console.log("WARNING: No orders found for these products");
+            }
+        } else {
+            console.log("ERROR: Seller has no products in DB");
+        }
+    }
+
+    if (inquiry.orderStatus && inquiry.orderStatus !== 'ALL') {
+        matches.orderStatus = inquiry.orderStatus;
+    }
+
+    const allOrdersCount = await this.orderModel.countDocuments({});
+    console.log("Total orders in DB:", allOrdersCount);
+    
+    const sampleOrders = await this.orderModel.find({}).limit(3);
+
+    // 4. AGGREGATION
+    try {
+        const result = await this.orderModel.aggregate([
+  { $match: matches },
+  { $sort: { updatedAt: -1 } },
+  { $skip: (page - 1) * limit },
+  { $limit: limit },
+
+  {
+    $lookup: {
+      from: "users",
+      localField: "userId",
+      foreignField: "_id",
+      as: "buyerData"
+    }
+  },
+  { $unwind: { path: "$buyerData", preserveNullAndEmptyArrays: true } },
+
+  {
+    $lookup: {
+      from: "orderitems",
+      let: { orderId: "$_id" },
+      pipeline: [
+        {
+          $match: {
+            $expr: { $eq: ["$orderId", "$$orderId"] }
+          }
+        },
+        {
+          $lookup: {
+            from: "products",
+            let: { pid: "$productId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: ["$_id", { $toObjectId: "$$pid" }]
+                  }
+                }
+              },
+              {
+                $project: {
+                  productName: 1,
+                  productImages: 1,
+                  productPrice: 1
+                }
+              }
+            ],
+            as: "product"
+          }
+        },
+        { $unwind: { path: "$product", preserveNullAndEmptyArrays: true } }
+      ],
+      as: "orderItems"
+    }
+  }
+]).exec();
+
+
+        
+        if (result.length > 0) {
+            result.forEach((order, i) => {
+                console.log(`Order ${i + 1}:`, {
+                    _id: order._id,
+                    buyerData: order.buyerData ? {
+                        hasData: true,
+                        userNick: order.buyerData.userNick,
+                        memberNick: order.buyerData.memberNick
+                    } : { hasData: false },
+                    orderTotal: order.orderTotal,
+                    orderStatus: order.orderStatus
+                });
+            });
+        }
+        
+        return result;
+    } catch (err) {
+        console.log("SERVICE: Aggregation error:", err);
+        return [];
+    }
+}
+
+
+public async getTotalOrdersCount(user: User, inquiry: OrderInquery): Promise<number> {
+    const userId = shapeIntoMongooseObjectId(user._id);
+    const matches: any = {};
+    
+    if (user.userType === 'CUSTOMER') {
+        matches.userId = userId;
+    }
+    // Seller uchun alohida logika...
+    
     if (inquiry.orderStatus && inquiry.orderStatus !== 'ALL') {
         matches.orderStatus = inquiry.orderStatus;
     }
     
-    const result = await this.orderModel.aggregate([
-        { $match: matches },
-        { $sort: { updatedAt: -1 } },
-        { $skip: (inquiry.page - 1) * inquiry.limit },
-        { $limit: inquiry.limit },
-        {
-            $lookup: {
-                from: "users",
-                localField: "userId",
-                foreignField: "_id",
-                as: "userData"
-            }
-        },
-        { $unwind: "$userData" }
-    ]).exec();
-    
-    return result;
-}
+    return await this.orderModel.countDocuments(matches);
 }
 
 
-
+};
 export default OrderService

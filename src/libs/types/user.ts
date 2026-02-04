@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { UserType, UserStatus } from "../enums/user.enums";
 import { Request } from "express";
 import { Session } from "express-session";
+import { Message } from "../Errors";
 
 export interface User {
     _id: Types.ObjectId;
@@ -44,6 +45,7 @@ export interface UserUpdateInput {
 }
 
 export interface ExtendedRequest extends Request {
+    flash(arg0: string, message: Message): unknown;
     user: User;
     file: Express.Multer.File;
     files: Express.Multer.File[];

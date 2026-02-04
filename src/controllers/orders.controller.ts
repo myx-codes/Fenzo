@@ -60,31 +60,55 @@ ordersController.updateOrder = async (req: ExtendedRequest, res: Response) => {
 
 // BSSR APIs
 ordersController.getOrders = async (req: ExtendedRequest, res: Response) => {
-    try {
-        console.log("getOrders");
-        // Querydan parametrlarni olamiz
-        const { page, limit, orderStatus } = req.query;
-        
-        const inquiry: OrderInquery = {
-            page: Number(page),
-            limit: Number(limit),
-            orderStatus: orderStatus as OrderStatus,
-        };
-
-        console.log("inquiry", inquiry);
-
-        // Service funksiyasini chaqiramiz (nomini getOrders qildik)
-        const result = await orderService.getOrders(req.user, inquiry);
-        console.log("getOrders Result:", JSON.stringify(result, null, 2));
-        
-
-        // ✅ O'zgarish: Ma'lumot olishda 200 (OK) ishlatiladi
-        res.status(HttpCode.OK).json(result);
-    } catch (err) {
-        console.log("Error getOrders", err);
-        if (err instanceof Errors) res.status(err.code).json(err);
-        else res.status(Errors.standard.code).json(Errors.standard);
+  try {
+    if (!req.user) {
+      return res.redirect("/login"); // Render o'rniga redirect
     }
+
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(Math.max(1, Number(req.query.limit) || 10), 100);
+    const orderStatus = req.query.orderStatus as OrderStatus;
+
+    const inquiry: OrderInquery = { page, limit, orderStatus };
+
+    // Parallel execution for better performance
+    const [orders, totalCount] = await Promise.all([
+      orderService.getOrders(req.user, inquiry),
+      orderService.getTotalOrdersCount(req.user, inquiry)
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    res.render("orders", {
+      orders,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems: totalCount,
+        itemsPerPage: limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+        nextPage: page < totalPages ? page + 1 : null,
+        prevPage: page > 1 ? page - 1 : null
+      },
+      orderStatus: orderStatus || "ALL",
+      user: req.user,
+      query: req.query // Hozirgi query parametrlarni saqlash
+    });
+
+  } catch (err) {
+    console.error("Error getOrders controller:", err);
+    
+    // User friendly error messages
+    if (err instanceof Errors) {
+      req.flash('error', err.message);
+      return res.redirect('back');
+    } else {
+      req.flash('error', Message.SOMETHING_WENT_WRONG);
+      return res.status(500).redirect('back');
+    }
+  }
 };
+
 
 export default ordersController
