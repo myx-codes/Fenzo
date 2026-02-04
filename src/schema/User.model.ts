@@ -31,6 +31,10 @@ const userSchema = new Schema(
         userImage: {
             type: String,
         },
+        userPoints: {
+            type: Number,
+            default: 0
+        },
         userAddress: {
             type: String,
         },

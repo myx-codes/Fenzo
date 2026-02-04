@@ -63,7 +63,7 @@ class SellerService{
     .exec();
     if(!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
     return result as User
-  }
+  };
 
     public async processSignup(input: UserInput): Promise<User> {
     const exist = await this.userModel
@@ -89,7 +89,7 @@ class SellerService{
         const user = await this.userModel.findById(id).lean();
         if (!user) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
         return user;
-    }
+  };
 
 
   public async updateSellerSettings(id: string, input: UserInput) {
@@ -105,7 +105,7 @@ class SellerService{
         if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
 
         return result;
-    }
+  };
 
 
   public async processLogin(input: LoginInput): Promise<User>{
@@ -123,6 +123,24 @@ class SellerService{
 
     return await this.userModel.findOne(user._id).exec() as User
     ;
+  };
+
+  public async addCustomerPoint(user: User, point: Number): Promise<User>{
+    console.log("addCustomerPoint");
+       const userId = shapeIntoMongooseObjectId(user._id);
+      const result =  await this.userModel.findOneAndUpdate(
+        {
+        _id: userId,
+        userType: UserType.CUSTOMER,
+      },
+      {
+        $inc: {userPoints: point}
+      },
+      {new: true}
+    )
+    .exec();
+
+    return result as User
   }
 
 };

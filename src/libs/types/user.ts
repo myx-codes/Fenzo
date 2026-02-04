@@ -11,6 +11,7 @@ export interface User {
     userPhone: string;
     userPassword: string;
     userImage?: string;
+    userPoints: number;
     userAddress?: string;
     userDesc?: string;
     createdAt: Date;

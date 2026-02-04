@@ -27,5 +27,13 @@ router
 .post("/order/create",
     userController.verifyAuth,
     ordersController.createOrder)
+.post("/order/update",
+    userController.verifyAuth,
+    ordersController.updateOrder)
+
+router
+.get("/order/all",
+    userController.verifyAuth,
+    ordersController.getMyOrders)
 
 export default router;
