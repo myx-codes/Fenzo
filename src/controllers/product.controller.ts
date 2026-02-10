@@ -110,7 +110,7 @@ productController.addProduct = async (req: SellerRequest, res: Response) => {
 
     const created = await productService.addProduct(data);
 
-    console.log("✅ PRODUCT CREATED:", {
+    console.log("PRODUCT CREATED:", {
       _id: created._id,
       userId: created.userId,
     });
@@ -239,13 +239,9 @@ productController.updateProductStatus = async (req: Request, res: Response) => {
 
 // SSR APIs
 productController.getProducts = async (req: Request, res: Response) => {
-  console.log("getProducts");
-  console.log("req.query:", req.query);
-
   try {
     const { page, limit, order, productCollection, search } = req.query;
 
-    // ✅ order ni xavfsiz parse qilish
     const orderParam = String(order || "").toUpperCase();
     const safeOrder: ProductInquiry["order"] =
       orderParam === "NEWEST" ||
@@ -275,24 +271,22 @@ productController.getProducts = async (req: Request, res: Response) => {
     res.send(result);
 
   } catch (err) {
-    console.log("❌ Error getProducts:", err);
+    console.log("Error getProducts:", err);
     res.status(500).send("Something went wrong");
   }
 };
 
 
-productController.getProduct = async(req: ExtendedRequest, res:Response) => {
-    console.log("getProduct");
-    try{
-        const {id} = req.params;
-        console.log("req.body", req.body);
-        const userId = req.user?._id?? null
-        const result = await productService.getProduct(userId, id);
-
-        res.send(result)
-    }catch{
-        console.log("Error getProduct")
-    }
+productController.getProduct = async (req: ExtendedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?._id ?? null;
+    const result = await productService.getProduct(userId, id);
+    res.send(result);
+  } catch (err) {
+    if (err instanceof Errors) res.status(err.code).json(err);
+    else res.status(Errors.standard.code).json(Errors.standard);
+  }
 };
 
 
