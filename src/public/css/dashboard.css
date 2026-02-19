@@ -204,6 +204,18 @@ body {
     justify-content: center;
     margin-right: 12px;
     color: var(--secondary-text);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.product-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-thumb i {
+    font-size: 20px;
 }
 
 .product-info h6 {

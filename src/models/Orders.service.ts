@@ -395,6 +395,92 @@ public async getTotalOrdersCount(user: User, inquiry: OrderInquery): Promise<num
     return await this.orderModel.countDocuments(matches);
 }
 
+/** Dashboard: total revenue from seller's products (itemQuantity * itemPrice) */
+public async getSellerRevenue(userId: ObjectId | string | Types.ObjectId): Promise<number> {
+    const sid = shapeIntoMongooseObjectId(userId);
+    const sellerProducts = await this.productModel.find({ userId: sid }).distinct('_id');
+    if (sellerProducts.length === 0) return 0;
+    const result = await this.orderItemModel.aggregate([
+        { $match: { productId: { $in: sellerProducts } } },
+        { $group: { _id: null, total: { $sum: { $multiply: ['$itemQuantity', '$itemPrice'] } } } }
+    ]).exec();
+    return result.length > 0 ? result[0].total : 0;
+}
+
+/** Dashboard: sales by day for last N days */
+public async getSellerSalesByDay(userId: ObjectId | string | Types.ObjectId, days: number = 7): Promise<{ date: string; revenue: number }[]> {
+    const sid = shapeIntoMongooseObjectId(userId);
+    const sellerProducts = await this.productModel.find({ userId: sid }).distinct('_id');
+    if (sellerProducts.length === 0) {
+        const out: { date: string; revenue: number }[] = [];
+        for (let i = days - 1; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            out.push({ date: d.toISOString().slice(0, 10), revenue: 0 });
+        }
+        return out;
+    }
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    startDate.setHours(0, 0, 0, 0);
+    const orderItems = await this.orderItemModel.aggregate([
+        { $match: { productId: { $in: sellerProducts } } },
+        { $lookup: { from: 'orders', localField: 'orderId', foreignField: '_id', as: 'order' } },
+        { $unwind: '$order' },
+        { $match: { 'order.createdAt': { $gte: startDate } } },
+        { $project: { revenue: { $multiply: ['$itemQuantity', '$itemPrice'] }, createdAt: '$order.createdAt' } }
+    ]).exec();
+    const byDate = new Map<string, number>();
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    for (let i = days - 1; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().slice(0, 10);
+        byDate.set(key, 0);
+    }
+    for (const item of orderItems) {
+        const d = new Date(item.createdAt);
+        const key = d.toISOString().slice(0, 10);
+        if (byDate.has(key)) byDate.set(key, (byDate.get(key) || 0) + item.revenue);
+    }
+    const sorted = Array.from(byDate.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+    return sorted.map(([date, revenue]) => ({
+        date: dayNames[new Date(date).getDay()],
+        revenue
+    }));
+}
+
+/** Dashboard: top selling products by quantity */
+public async getTopSellingProducts(userId: ObjectId | string | Types.ObjectId, limit: number = 5): Promise<Array<{ productName: string; productPrice: number; productImages: string[]; unitsSold: number }>> {
+    const sid = shapeIntoMongooseObjectId(userId);
+    const sellerProducts = await this.productModel.find({ userId: sid }).distinct('_id');
+    if (sellerProducts.length === 0) return [];
+    const result = await this.orderItemModel.aggregate([
+        { $match: { productId: { $in: sellerProducts } } },
+        { $group: { _id: '$productId', unitsSold: { $sum: '$itemQuantity' } } },
+        { $sort: { unitsSold: -1 } },
+        { $limit: limit },
+        {
+            $lookup: {
+                from: 'products',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'product'
+            }
+        },
+        { $unwind: '$product' },
+        {
+            $project: {
+                productName: '$product.productName',
+                productPrice: '$product.productPrice',
+                productImages: '$product.productImages',
+                unitsSold: 1
+            }
+        }
+    ]).exec();
+    return result;
+}
+
 
 };
 export default OrderService

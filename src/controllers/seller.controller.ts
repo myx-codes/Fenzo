@@ -6,9 +6,13 @@ import { UserStatus, UserType } from "../libs/enums/user.enums";
 import SellerService from "../models/Seller.service";
 import { SellerRequest } from "../libs/types/user";
 import UserService from "src/models/User.service";
+import OrderService from "../models/Orders.service";
+import ProductService from "../models/Product.service";
 
 const sellerController: T = {};
 const sellerService = new SellerService();
+const orderService = new OrderService();
+const productService = new ProductService();
 
 
 sellerController.goHome = ( req: Request, res: Response) => {
@@ -46,17 +50,33 @@ sellerController.getLogin = (req: Request, res: Response) => {
 };
 
 
-sellerController.goDashboard = (req: SellerRequest, res: Response) => {
+sellerController.goDashboard = async (req: SellerRequest, res: Response) => {
     try {
         console.log("Seller, goDashboard");
-        console.log("DASHBOARD SESSION USER:", req.session.user);
         if (!req.session?.user) {
-            return res.redirect("/seller/login"); 
+            return res.redirect("/seller/login");
         }
-        res.render("dashboard", { 
-            user: req.session.user
+        const user = req.session.user;
+        const userId = user._id;
+        const [totalRevenue, totalOrders, productsCount, salesByDay, topProducts] = await Promise.all([
+            orderService.getSellerRevenue(userId),
+            orderService.getTotalOrdersCount(user, { page: 1, limit: 1, orderStatus: "ALL" }),
+            productService.getSellerProductsCount(userId),
+            orderService.getSellerSalesByDay(userId, 7),
+            orderService.getTopSellingProducts(userId, 5)
+        ]);
+        const conversionRate = productsCount > 0 && totalOrders > 0
+            ? ((totalOrders / productsCount) * 100).toFixed(1) + "%"
+            : "0%";
+        res.render("dashboard", {
+            user,
+            totalRevenue,
+            totalOrders,
+            productsCount,
+            conversionRate,
+            salesByDay,
+            topProducts
         });
-
     } catch (err) {
         console.log("Error, goDashboard", err);
         res.redirect("/seller/login");

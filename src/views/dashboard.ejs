@@ -6,8 +6,6 @@
     
     <%- include('includes/dashboard-header', {
         activeTab: 'overview',
-        <!-- pageTitle: 'Overview', -->
-        <!-- pageSubtitle: 'Track your sales and performance', -->
         user: user
     }) %>
 
@@ -19,10 +17,7 @@
                     <i class="fa-solid fa-dollar-sign metric-icon"></i>
                 </div>
                 <div class="d-flex align-items-baseline mt-2">
-                    <h2 class="metric-value">$12,450.00</h2>
-                    <span class="trend-badge">
-                        <i class="fa-solid fa-arrow-trend-up me-1"></i> 12%
-                    </span>
+                    <h2 class="metric-value">$<%= typeof totalRevenue !== 'undefined' ? Number(totalRevenue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00' %></h2>
                 </div>
             </div>
         </div>
@@ -34,10 +29,7 @@
                     <i class="fa-solid fa-cart-shopping metric-icon"></i>
                 </div>
                 <div class="d-flex align-items-baseline mt-2">
-                    <h2 class="metric-value">145</h2>
-                    <span class="trend-badge">
-                        <i class="fa-solid fa-arrow-trend-up me-1"></i> 8.5%
-                    </span>
+                    <h2 class="metric-value"><%= typeof totalOrders !== 'undefined' ? totalOrders : 0 %></h2>
                 </div>
             </div>
         </div>
@@ -49,7 +41,7 @@
                     <i class="fa-solid fa-box-archive metric-icon"></i>
                 </div>
                 <div class="mt-2">
-                    <h2 class="metric-value">24</h2>
+                    <h2 class="metric-value"><%= typeof productsCount !== 'undefined' ? productsCount : 0 %></h2>
                 </div>
             </div>
         </div>
@@ -61,8 +53,8 @@
                     <i class="fa-solid fa-chart-pie metric-icon"></i>
                 </div>
                 <div class="d-flex align-items-baseline mt-2">
-                    <h2 class="metric-value">3.2%</h2>
-                    <span class="badge bg-light text-secondary border ms-2" style="font-size: 11px;">Avg</span>
+                    <h2 class="metric-value"><%= typeof conversionRate !== 'undefined' ? conversionRate : '0%' %></h2>
+                    <span class="badge bg-light text-secondary border ms-2 conversion-badge">Avg</span>
                 </div>
             </div>
         </div>
@@ -81,18 +73,28 @@
                     </select>
                 </div>
                 
-                <div class="chart-placeholder">
-                    <div class="chart-line-mock"></div>
-                    <div class="chart-bar" style="height: 40%;"></div>
-                    <div class="chart-bar" style="height: 65%;"></div>
-                    <div class="chart-bar" style="height: 50%;"></div>
-                    <div class="chart-bar" style="height: 80%; background-color: #3c4257;"></div> 
-                    <div class="chart-bar" style="height: 60%;"></div>
-                    <div class="chart-bar" style="height: 75%;"></div>
-                    <div class="chart-bar" style="height: 55%;"></div>
+                <% const dayData = typeof salesByDay !== 'undefined' && Array.isArray(salesByDay) ? salesByDay : []; %>
+                <div class="chart-placeholder d-flex align-items-end gap-2">
+                    <% 
+                    let maxRev = 1;
+                    for (let i = 0; i < dayData.length; i++) { if (dayData[i].revenue > maxRev) maxRev = dayData[i].revenue; }
+                    for (let i = 0; i < dayData.length; i++) { 
+                        const d = dayData[i];
+                        const pct = Math.round((d.revenue / maxRev) * 100);
+                    %>
+                    <div class="chart-bar flex-grow-1" style="height: <%= pct %>%;" title="$<%= Number(d.revenue).toFixed(0) %>"></div>
+                    <% } %>
+                    <% if (dayData.length === 0) { %>
+                    <div class="text-muted small align-self-center">No sales data yet</div>
+                    <% } %>
                 </div>
                 <div class="d-flex justify-content-between mt-3 text-muted small">
+                    <% for (let i = 0; i < dayData.length; i++) { %>
+                    <span><%= dayData[i].date %></span>
+                    <% } %>
+                    <% if (dayData.length === 0) { %>
                     <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                    <% } %>
                 </div>
             </div>
         </div>
@@ -102,60 +104,35 @@
                 <h5 class="panel-title">Top Selling Products</h5>
                 
                 <div class="d-flex flex-column">
+                    <% 
+                    const products = typeof topProducts !== 'undefined' && Array.isArray(topProducts) ? topProducts : [];
+                    products.forEach(function(p) { 
+                        const images = p.productImages || [];
+                        const firstImage = images[0] || '';
+                    %>
                     <div class="product-item">
                         <div class="product-thumb">
-                            <i class="fa-solid fa-mobile-screen"></i>
+                            <% if (firstImage) { %>
+                                <img src="/<%= firstImage %>" 
+                                     alt="<%= p.productName || 'Product' %>">
+                            <% } else { %>
+                                <i class="fa-solid fa-box"></i>
+                            <% } %>
                         </div>
                         <div class="product-info flex-grow-1">
-                            <h6>iPhone 15 Pro</h6>
-                            <span>24 units sold</span>
+                            <h6><%= p.productName || 'Product' %></h6>
+                            <span><%= p.unitsSold || 0 %> units sold</span>
                         </div>
                         <div class="product-stats">
-                            <div class="product-price">$999</div>
+                            <div class="product-price">$<%= typeof p.productPrice !== 'undefined' ? Number(p.productPrice).toLocaleString() : '0' %></div>
                         </div>
                     </div>
-
-                    <div class="product-item">
-                        <div class="product-thumb">
-                            <i class="fa-solid fa-headphones"></i>
-                        </div>
-                        <div class="product-info flex-grow-1">
-                            <h6>Sony WH-1000XM5</h6>
-                            <span>18 units sold</span>
-                        </div>
-                        <div class="product-stats">
-                            <div class="product-price">$349</div>
-                        </div>
-                    </div>
-
-                    <div class="product-item">
-                        <div class="product-thumb">
-                            <i class="fa-solid fa-laptop"></i>
-                        </div>
-                        <div class="product-info flex-grow-1">
-                            <h6>MacBook Air M2</h6>
-                            <span>12 units sold</span>
-                        </div>
-                        <div class="product-stats">
-                            <div class="product-price">$1,199</div>
-                        </div>
-                    </div>
-
-                    <div class="product-item">
-                        <div class="product-thumb">
-                            <i class="fa-solid fa-clock"></i>
-                        </div>
-                        <div class="product-info flex-grow-1">
-                            <h6>Apple Watch S9</h6>
-                            <span>9 units sold</span>
-                        </div>
-                        <div class="product-stats">
-                            <div class="product-price">$399</div>
-                        </div>
-                    </div>
-                    
+                    <% }); %>
+                    <% if (products.length === 0) { %>
+                    <div class="text-muted small py-3 text-center">No sales yet</div>
+                    <% } %>
                     <div class="mt-3 text-center">
-                        <a href="/seller/products" class="small text-decoration-none fw-bold" style="color: var(--accent-blue);">View All Products</a>
+                        <a href="/seller/products" class="small text-decoration-none fw-bold view-all-link">View All Products</a>
                     </div>
 
                 </div>

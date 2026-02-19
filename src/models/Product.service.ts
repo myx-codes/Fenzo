@@ -106,6 +106,13 @@ public async addProduct(input: ProductInput): Promise<Product> {
     };
 
 
+    public async getSellerProductsCount(userId: Types.ObjectId): Promise<number> {
+        return await this.productModel.countDocuments({
+            userId,
+            productStatus: { $ne: "DELETE" }
+        });
+    }
+
     public async getProductDetail(id: string): Promise<Product> {
         const result = await this.productModel.findById(id).lean();
         if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
