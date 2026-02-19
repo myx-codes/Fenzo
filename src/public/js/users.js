@@ -1,17 +1,17 @@
 console.log("Users frontend javascript file");
 
 $(function () {
-  $(".member-status").on("change", function (e) {
+  $(".user-status").on("change", function (e) {
     const id = e.target.id;
     console.log("id:", id);
 
-    const memberStatus = $(`#${id}.member-status`).val();
-    console.log("memberStatus:", memberStatus);
+    const userStatus = $(`#${id}.user-status`).val();
+    console.log("userStatus:", userStatus);
 
     // Axios updateChosenUser
     axios.post("/admin/user/edit", {
       _id: id,
-      memberStatus: memberStatus,
+      userStatus: userStatus,
     })
     .then((response) => {
       console.log("response:", response);
@@ -20,7 +20,7 @@ $(function () {
 
       if (result.data) {
         console.log("User updated!");
-        $(".member-status").blur();
+        $(".user-status").blur();
       } else {
         alert("User update failed!");
       }

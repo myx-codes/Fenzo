@@ -9,13 +9,14 @@ export enum HttpCode {
     INTERNAL_SERVER_ERROR = 500,
 }
 
+
 export enum Message {
     SOMETHING_WENT_WRONG = "Something went wrong!",
     NO_DATA_FOUND = "No data found!",
     BAD_REQUEST = "Bad request!",
     TOKEN_CREATION_FAILED = "Token creation failed!",
     USED_NICK_PHONE = "Nickname or Phone number is already in use!",
-    NO_USER_NICK = "No member found with this nickname!",
+    NO_USER_NICK = "No user found with this nickname!",
     WRONG_PASSWORD = "Password is incorrect!",
     NOT_AUTHENTICATED = "You need to login first!",
     BLOCKED_USER = "Your account has been blocked by Admin!",

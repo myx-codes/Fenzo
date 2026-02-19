@@ -350,7 +350,7 @@ public async getOrders(user: User, inquiry: OrderInquery): Promise<any[]> {
                     buyerData: order.buyerData ? {
                         hasData: true,
                         userNick: order.buyerData.userNick,
-                        memberNick: order.buyerData.memberNick
+                        sellerNick: order.buyerData.sellerNick
                     } : { hasData: false },
                     orderTotal: order.orderTotal,
                     orderStatus: order.orderStatus
