@@ -24,7 +24,7 @@ productController.goAddProduct = ( req: Request, res: Response) => {
     }
 };
 
-productController.getAllProducts = async (req: Request, res: Response) => {
+productController.getAllProducts = async (req: SellerRequest, res: Response) => {
   try {
     console.log("getAllProducts");
 
@@ -47,6 +47,8 @@ productController.getAllProducts = async (req: Request, res: Response) => {
     const page = Number(req.query.page) || 1;
     const limit = 10;
 
+    const userId = req.user?._id ? shapeIntoMongooseObjectId(req.user._id) : undefined;
+
     const { products, total } = await productService.getAllProducts({
       page,
       limit,
@@ -57,6 +59,7 @@ productController.getAllProducts = async (req: Request, res: Response) => {
             productCollectionParam as keyof typeof ProductCollection
           ]
         : undefined,
+      userId,
     });
 
     const totalPages = Math.ceil(total / limit);

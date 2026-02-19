@@ -47,6 +47,10 @@ public async addProduct(input: ProductInput): Promise<Product> {
         // 1. Match (Filter) yasash
         const match: any = { productStatus: { $ne: "DELETE" } }; // O'chirilganlarni ko'rsatma
 
+        if (inquiry.userId) {
+            match.userId = inquiry.userId;
+        }
+
         if (inquiry.productCollection) {
             match.productCollection = inquiry.productCollection;
         }

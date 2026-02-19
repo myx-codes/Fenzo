@@ -372,8 +372,21 @@ public async getTotalOrdersCount(user: User, inquiry: OrderInquery): Promise<num
     
     if (user.userType === 'CUSTOMER') {
         matches.userId = userId;
+    } else if (user.userType === 'SELLER') {
+        const sellerProducts = await this.productModel.find({ userId }).distinct('_id');
+        if (sellerProducts.length > 0) {
+            const myOrderIds = await this.orderItemModel.distinct('orderId', {
+                productId: { $in: sellerProducts }
+            });
+            if (myOrderIds.length > 0) {
+                matches._id = { $in: myOrderIds };
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
     }
-    // Seller uchun alohida logika...
     
     if (inquiry.orderStatus && inquiry.orderStatus !== 'ALL') {
         matches.orderStatus = inquiry.orderStatus;
