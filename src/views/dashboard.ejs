@@ -82,7 +82,7 @@
                         const d = dayData[i];
                         const pct = Math.round((d.revenue / maxRev) * 100);
                     %>
-                    <div class="chart-bar flex-grow-1" style="height: <%= pct %>%;" title="$<%= Number(d.revenue).toFixed(0) %>"></div>
+                    <div class="chart-bar flex-grow-1" style="--bar-height: <%= pct %>%;"></div>
                     <% } %>
                     <% if (dayData.length === 0) { %>
                     <div class="text-muted small align-self-center">No sales data yet</div>
@@ -132,7 +132,7 @@
                     <div class="text-muted small py-3 text-center">No sales yet</div>
                     <% } %>
                     <div class="mt-3 text-center">
-                        <a href="/seller/products" class="small text-decoration-none fw-bold view-all-link">View All Products</a>
+                        <a href="/seller/orders" class="small text-decoration-none fw-bold view-all-link">View All Products</a>
                     </div>
 
                 </div>
