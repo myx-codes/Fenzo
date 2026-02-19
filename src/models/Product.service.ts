@@ -135,55 +135,30 @@ public async addProduct(input: ProductInput): Promise<Product> {
 
 
     // SSR APIs
-    public async getProducts(inquiry: ProductInquiry): Promise<Product[]> {
-  const match: any = { productStatus: ProductStatus.ACTIVE };
+ public async getProducts(inquery:ProductInquiry): Promise<Product[]> {
+    const match: T = {productStatus: ProductStatus.ACTIVE};
+    if(inquery.productCollection)
+        match.productCollection = inquery.productCollection;
+    if(inquery.search) {
+        // match.productName = inquery.search
+        match.productName = { $regex: new RegExp(inquery.search, "i")}
+    }
 
-  if (inquiry.productCollection) {
-    match.productCollection = inquiry.productCollection;
-  }
+    const orderField = inquery.order ?? "createdAt";
 
-  if (inquiry.search) {
-    match.productName = { $regex: new RegExp(inquiry.search, "i") };
-  }
+    const sort: T = orderField === "productPrice" 
+    ? {[orderField]: 1} 
+    : {[orderField]: -1};
 
-  // ✅ SORT LOGIC (ENUM asosida)
-  let sort: any;
-
-  switch (inquiry.order) {
-    case "PRICE_ASC":
-      sort = { productPrice: 1 };
-      break;
-
-    case "PRICE_DESC":
-      sort = { productPrice: -1 };
-      break;
-
-    case "TOP_RATED":
-      sort = { productRating: -1 };
-      break;
-
-    case "NEWEST":
-    default:
-      sort = { createdAt: -1 };
-  }
-
-  const page = Number(inquiry.page) || 1;
-  const limit = Number(inquiry.limit) || 10;
-  const skip = (page - 1) * limit;
-
-  const result = await this.productModel.aggregate([
-    { $match: match },
-    { $sort: sort },
-    { $skip: skip },
-    { $limit: limit }
-  ]).exec();
-
-  if (!result.length) {
-    throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
-  }
-
-  return result as Product[];
-}
+    const result = await this.productModel.aggregate([
+        {$match: match},
+        {$sort: sort},
+        {$skip: (inquery.page * 1 - 1) * inquery.limit},
+        {$limit: inquery.limit * 1},
+    ]).exec();
+    if(!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+    return result;
+};
 
 
     public async getProduct(userId: Types.ObjectId | null, id: string): Promise<Product>{

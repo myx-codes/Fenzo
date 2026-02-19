@@ -31,14 +31,11 @@ export interface Product {
 
 export interface ProductInput {
   userId: Types.ObjectId;
-
   productCollection: ProductCollection;
   productName: string;
   productDesc: string;
-
   productPrice: number;
   productStock: number;
-
   productStatus?: ProductStatus;
   productType?: ProductType;
   productDiscountPrice?: number;
@@ -69,7 +66,7 @@ export interface ProductUpdateInput {
 
 
 export interface ProductInquiry {
-  order?: "NEWEST" | "PRICE_ASC" | "PRICE_DESC" | "TOP_RATED";
+  order?: string;
   page: number;
   limit: number;
   productCollection?: ProductCollection;

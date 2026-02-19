@@ -176,18 +176,33 @@ public async getMyOrders(user: User, inquery: OrderInquery): Promise<Order[]>{
 public async updateOrder(user: User, input: OrderUpdateInput): Promise<Order>{
         const userId = shapeIntoMongooseObjectId(user._id);
         const orderId = shapeIntoMongooseObjectId(input.orderId);
-        let orderStatus = input.orderStatus;
+        const orderStatus = input.orderStatus;
+
+        let matchFilter: any;
+        if (user.userType === 'SELLER') {
+            const sellerProducts = await this.productModel.find({ userId }).distinct('_id');
+            const orderItemsWithMyProducts = await this.orderItemModel.findOne({
+                orderId,
+                productId: { $in: sellerProducts }
+            });
+            if (!orderItemsWithMyProducts) {
+                throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+            }
+            matchFilter = { _id: orderId };
+        } else {
+            matchFilter = { userId, _id: orderId };
+        }
 
         const result = await this.orderModel.findOneAndUpdate(
-            {userId: userId,_id: orderId},
-            {orderStatus: orderStatus},
-            {new: true}
+            matchFilter,
+            { orderStatus },
+            { new: true }
         ).exec();
 
         if(!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
 
-        if(orderStatus = OrderStatus.PROCESSING){
-            await this.sellerService.addCustomerPoint(user, 1);
+        if(orderStatus === OrderStatus.PROCESSING){
+            await this.sellerService.addCustomerPoint({ _id: result.userId } as User, 1);
         }
         return result.toObject()
 };
@@ -290,7 +305,7 @@ public async getOrders(user: User, inquiry: OrderInquery): Promise<any[]> {
 
   {
     $lookup: {
-      from: "orderitems",
+      from: "orderItems",
       let: { orderId: "$_id" },
       pipeline: [
         {
@@ -305,9 +320,7 @@ public async getOrders(user: User, inquiry: OrderInquery): Promise<any[]> {
             pipeline: [
               {
                 $match: {
-                  $expr: {
-                    $eq: ["$_id", { $toObjectId: "$$pid" }]
-                  }
+                  $expr: { $eq: ["$_id", "$$pid"] }
                 }
               },
               {

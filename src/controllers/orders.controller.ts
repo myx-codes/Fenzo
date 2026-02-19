@@ -47,7 +47,12 @@ ordersController.getMyOrders = async (req:ExtendedRequest, res: Response) => {
 ordersController.updateOrder = async (req: ExtendedRequest, res: Response) => {
     console.log("updateOrder");
     try{
-        const input: OrderUpdateInput = req.body;
+        const orderId = req.params?.id || req.body?.orderId;
+        const orderStatus = req.body?.orderStatus;
+        if (!orderId || !orderStatus) {
+            return res.status(400).json({ message: "orderId and orderStatus are required" });
+        }
+        const input: OrderUpdateInput = { orderId, orderStatus };
         const result = await orderService.updateOrder(req.user, input);
 
         res.status(HttpCode.CREATED).json(result);

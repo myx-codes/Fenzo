@@ -18,8 +18,8 @@ router.post("/auth/logout", userController.logout);
 // Product
 router
 .get("/customer/products", productController.getProducts)
-.get("/customer/product/:id",
-    userController.retrieveAuth,
+.get("/customer/product/detail/:id",
+
     productController.getProduct)
 
 // Order

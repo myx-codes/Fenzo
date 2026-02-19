@@ -17,7 +17,8 @@ export enum ProductCollection {
     COSMETICS = "COSMETICS",
     BODY_CARE = "BODY_CARE",
     VITAMINS = "VITAMINS",
-    ELECTRONICS = "ELECTRONICS"
+    ELECTRONICS = "ELECTRONICS",
+    KIDS = "KIDS"
 }
 
 export enum ProductGender {

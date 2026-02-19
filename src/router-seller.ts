@@ -67,6 +67,8 @@ routerSeller
 .get("/orders", 
     sellerController.verifySeller, 
     ordersController.getOrders)
-
+.post("/orders/:id",
+    sellerController.verifySeller,
+    ordersController.updateOrder)
 
 export default routerSeller;
