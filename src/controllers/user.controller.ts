@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { T } from "../libs/types/common";
-import { UserInput, User, LoginInput, ExtendedRequest } from "../libs/types/user";
+import { UserInput, User, LoginInput, ExtendedRequest, UserProfileUpdateInput } from "../libs/types/user";
 import UserService from "../models/User.service";
 import { Errors, HttpCode, Message } from "../libs/Errors";
 import AuthService from "../models/Auth.Service";
@@ -127,7 +127,37 @@ userController.retrieveAuth = async ( req: ExtendedRequest, res: Response, next:
         console.log("Error retrieveAuth", err);
         next();
     }
-}
+};
 
+userController.updateProfile = async (req: ExtendedRequest, res: Response) => {
+    try {
+        const user = req.user;
+        if (!user?._id) {
+            return res.status(HttpCode.UNAUTHORIZED).json({ message: Message.NOT_AUTHENTICATED });
+        }
+        const body = req.body || {};
+        const input: UserProfileUpdateInput = {};
+        if (body.userNick !== undefined && body.userNick !== "") input.userNick = String(body.userNick).trim();
+        if (body.userPhone !== undefined && body.userPhone !== "") input.userPhone = String(body.userPhone).trim();
+        if (body.userAddress !== undefined) input.userAddress = String(body.userAddress).trim();
+        if (body.userDesc !== undefined) input.userDesc = String(body.userDesc).trim();
+        if (body.userPassword !== undefined && body.userPassword !== "") input.userPassword = body.userPassword;
+        if (req.file?.path) {
+            input.userImage = req.file.path.replace(/\\/g, "/");
+        } else if (body.userImage !== undefined && body.userImage !== "") {
+            input.userImage = String(body.userImage).trim();
+        }
+        const result = await userService.updateProfile(user._id, input);
+        if (req.session) {
+            req.session.user = result;
+            req.session.save(() => {});
+        }
+        res.status(HttpCode.OK).json({ user: result });
+    } catch (err) {
+        console.log("Error updateProfile", err);
+        if (err instanceof Errors) res.status(err.code).json(err);
+        else res.status(Errors.standard.code).json(Errors.standard);
+    }
+};
 
 export default userController;

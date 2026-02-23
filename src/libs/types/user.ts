@@ -44,6 +44,16 @@ export interface UserUpdateInput {
     userDesc?: string;
 }
 
+/** Fields a user can update on their own profile (no _id, no userType/userStatus) */
+export interface UserProfileUpdateInput {
+    userNick?: string;
+    userPhone?: string;
+    userPassword?: string;
+    userImage?: string;
+    userAddress?: string;
+    userDesc?: string;
+}
+
 export interface ExtendedRequest extends Request {
     flash(arg0: string, message: Message): unknown;
     user: User;

@@ -1,9 +1,11 @@
 import express from 'express';
 import path from 'path';
-import  userController from './controllers/user.controller';
+import userController from './controllers/user.controller';
 import ordersController from './controllers/orders.controller';
 import productController from './controllers/product.controller';
-const router  = express.Router();
+import makeUploader from './libs/utils/uploader';
+
+const router = express.Router();
 
 router.get('/', userController.goHome)
 router.get('/customer/sellers', userController.getSellers);
@@ -13,6 +15,16 @@ router.get('/customer/sellers', userController.getSellers);
 router.post("/auth/signup", userController.signup);
 router.post("/auth/login", userController.login);
 router.post("/auth/logout", userController.logout);
+router.put("/auth/profile",
+    userController.verifyAuth,
+    makeUploader("users").single("userImage"),
+    userController.updateProfile
+);
+router.post("/auth/profile",
+    userController.verifyAuth,
+    makeUploader("users").single("userImage"),
+    userController.updateProfile
+);
 
 
 // Product
