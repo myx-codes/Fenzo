@@ -174,7 +174,7 @@ public async addProduct(input: ProductInput): Promise<Product> {
 
     public async getProduct(userId: Types.ObjectId | null, id: string): Promise<Product>{
         const productId = shapeIntoMongooseObjectId(id);
-        console.log("userId", userId);
+        console.log("[getProduct] productId", productId, "userId", userId);
 
         let result =  await this.productModel.findOne({_id: productId, productStatus: ProductStatus.ACTIVE}).lean<Product>().exec();
         if(!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_PRODUCT_FOUND);
@@ -184,21 +184,32 @@ public async addProduct(input: ProductInput): Promise<Product> {
                 userId: userId,
                 viewRefId: productId,
                 viewGroup: ViewGroup.PRODUCT,
-            }
-            console.log("userId", userId);
+            };
+            console.log("[getProduct] checking view existence", { userId, productId, viewGroup: ViewGroup.PRODUCT });
 
             const existView = await this.viewService.checkViewExistance(input);
+            console.log("[getProduct] existView", !!existView, existView ? "viewId:" + existView._id : "none");
 
-            console.log("exist", !! existView);
             if(!existView){
+                console.log("[getProduct] new view – inserting and incrementing productViews");
                 await this.viewService.insertUserView(input);
+                console.log("[getProduct] view inserted, incrementing productViews for", productId);
 
-
-            const result2 = await this.productModel.findByIdAndUpdate(
-                productId,
-                {$inc:{productViews: 1}},
-                {new: true}
-            )
+                const updated = await this.productModel.findByIdAndUpdate(
+                    productId,
+                    { $inc: { productViews: 1 } },
+                    { new: true }
+                )
+                    .lean<Product>()
+                    .exec();
+                if (updated) {
+                    console.log("[getProduct] productViews incremented, new count:", updated.productViews);
+                    result = updated;
+                } else {
+                    console.error("[getProduct] findByIdAndUpdate returned null for productId", productId);
+                }
+            } else {
+                console.log("[getProduct] view already exists, skipping increment");
             }
         }
         return result;

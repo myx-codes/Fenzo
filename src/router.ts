@@ -19,7 +19,7 @@ router.post("/auth/logout", userController.logout);
 router
 .get("/customer/products", productController.getProducts)
 .get("/customer/product/detail/:id",
-
+    userController.verifyAuth,
     productController.getProduct)
 
 // Order

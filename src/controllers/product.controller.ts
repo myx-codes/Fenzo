@@ -272,10 +272,27 @@ productController.getProducts = async (req: Request, res: Response) => {
 
 
 
+function extractUserIdFromReq(req: ExtendedRequest): string | null {
+  const session = (req as any).session;
+  const user = req.user ?? session?.user ?? null;
+  if (!user) return null;
+  let rawId = user._id;
+  if (rawId == null && (user as any).id != null) rawId = (user as any).id;
+  if (rawId == null) return null;
+  if (typeof rawId === "string") return rawId;
+  if (typeof rawId === "object" && rawId !== null && "toString" in rawId) return rawId.toString();
+  if (typeof rawId === "object" && (rawId as any).$oid) return (rawId as any).$oid;
+  return null;
+}
+
 productController.getProduct = async (req: ExtendedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const userId = req.user?._id ?? null;
+    const rawUserId = extractUserIdFromReq(req);
+    const userId = rawUserId != null ? shapeIntoMongooseObjectId(rawUserId) : null;
+    if (!userId && (req.user || (req as any).session?.user)) {
+      console.warn("[getProduct] auth present but no userId – req.user:", !!req.user, "session.user:", !!((req as any).session?.user), "user keys:", req.user ? Object.keys(req.user) : (req as any).session?.user ? Object.keys((req as any).session.user) : []);
+    }
     const result = await productService.getProduct(userId, id);
     res.send(result);
   } catch (err) {

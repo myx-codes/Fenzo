@@ -121,8 +121,7 @@ class SellerService{
 
     if(!isMatch) throw new Errors(HttpCode.UNAUTHORIZED, Message.WRONG_PASSWORD);
 
-    return await this.userModel.findOne(user._id).exec() as User
-    ;
+    return (await this.userModel.findById(user._id).lean().exec()) as User;
   };
 
   public async addCustomerPoint(user: User, point: Number): Promise<User>{
