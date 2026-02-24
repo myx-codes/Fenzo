@@ -9,6 +9,10 @@ import { OrderStatus } from "../libs/enums/order.enums";
 import SellerService from "./Seller.service";
 import ProductModel from "../schema/Product.model";
 
+/** Customer faqat shu statuslarni o'rnatishi mumkin (cancel) */
+const CUSTOMER_ALLOWED_STATUSES = [OrderStatus.CANCELLED];
+/** Seller faqat shu statuslarni o'rnatishi mumkin */
+const SELLER_ALLOWED_STATUSES = [OrderStatus.PROCESSING, OrderStatus.SHIPPED, OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.REFUNDED];
 
 class OrderService{
     private readonly orderModel;
@@ -142,7 +146,10 @@ public async recordOrderItem(orderId: Types.ObjectId,input: any[] ): Promise<voi
 
 public async getMyOrders(user: User, inquery: OrderInquery): Promise<Order[]>{
         const userId = shapeIntoMongooseObjectId(user._id);
-        const matches = {userId: userId, orderStatus: inquery.orderStatus};
+        const matches: any = { userId };
+        if (inquery.orderStatus && inquery.orderStatus !== "ALL") {
+            matches.orderStatus = inquery.orderStatus;
+        }
 
         const result = await this.orderModel.aggregate([
             {$match: matches},
@@ -178,6 +185,16 @@ public async updateOrder(user: User, input: OrderUpdateInput): Promise<Order>{
         const orderId = shapeIntoMongooseObjectId(input.orderId);
         const orderStatus = input.orderStatus;
 
+        if (user.userType === 'SELLER') {
+            if (!SELLER_ALLOWED_STATUSES.includes(orderStatus)) {
+                throw new Errors(HttpCode.FORBIDDEN, Message.NOT_ALLOWED);
+            }
+        } else {
+            if (!CUSTOMER_ALLOWED_STATUSES.includes(orderStatus)) {
+                throw new Errors(HttpCode.FORBIDDEN, Message.NOT_ALLOWED);
+            }
+        }
+
         let matchFilter: any;
         if (user.userType === 'SELLER') {
             const sellerProducts = await this.productModel.find({ userId }).distinct('_id');
@@ -195,8 +212,8 @@ public async updateOrder(user: User, input: OrderUpdateInput): Promise<Order>{
 
         const result = await this.orderModel.findOneAndUpdate(
             matchFilter,
-            { orderStatus },
-            { new: true }
+            { $set: { orderStatus } },
+            { new: true, runValidators: true }
         ).exec();
 
         if(!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);

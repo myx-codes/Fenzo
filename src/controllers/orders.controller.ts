@@ -12,13 +12,22 @@ const orderService = new OrderService()
 
 ordersController.createOrder = async(req:ExtendedRequest, res: Response) => {
     try{
-        console.log("createOrder");
-        const result = await orderService.createOrder(req.user, req.body)
+        const body = req.body as { items?: Array<{ productId: string; quantity?: number; itemQuantity?: number; price?: number; itemPrice?: number }> } | any[];
+        const rawItems = Array.isArray(body) ? body : (body?.items ?? []);
+        if (!Array.isArray(rawItems) || rawItems.length === 0) {
+            return res.status(400).json({ message: "items array is required" });
+        }
+        const input = rawItems.map((item: any) => ({
+            productId: item.productId,
+            itemQuantity: item.itemQuantity ?? item.quantity ?? 1,
+            itemPrice: item.itemPrice ?? item.price ?? 0,
+        }));
+        const result = await orderService.createOrder(req.user, input);
 
         res.status(HttpCode.CREATED).json(result);
     }catch(err){
         console.log("Error createOrder", err);
-        if(err instanceof Errors)res.status(err.code).json(err);
+        if(err instanceof Errors) res.status(err.code).json(err);
         else res.status(Errors.standard.code).json(Errors.standard);
     }
 };
@@ -47,18 +56,19 @@ ordersController.getMyOrders = async (req:ExtendedRequest, res: Response) => {
 ordersController.updateOrder = async (req: ExtendedRequest, res: Response) => {
     console.log("updateOrder");
     try{
-        const orderId = req.params?.id || req.body?.orderId;
-        const orderStatus = req.body?.orderStatus;
-        if (!orderId || !orderStatus) {
+        const orderId = req.params?.id ?? req.body?.orderId;
+        let orderStatus = req.body?.orderStatus;
+        if (!orderId || orderStatus == null || orderStatus === "") {
             return res.status(400).json({ message: "orderId and orderStatus are required" });
         }
-        const input: OrderUpdateInput = { orderId, orderStatus };
+        orderStatus = String(orderStatus).toUpperCase().trim();
+        const input: OrderUpdateInput = { orderId: String(orderId), orderStatus: orderStatus as OrderStatus };
         const result = await orderService.updateOrder(req.user, input);
 
         res.status(HttpCode.CREATED).json(result);
     }catch(err){
-        console.log("Error updateOrder");
-        if(err instanceof Errors)res.status(Errors.standard.code).json(err);
+        console.log("Error updateOrder", err);
+        if(err instanceof Errors) res.status(err.code).json(err);
         else res.status(Errors.standard.code).json(Errors.standard);
     }
 };

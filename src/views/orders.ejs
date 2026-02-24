@@ -70,8 +70,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% orders.forEach(function(order, index) { %>
-                    <tr>
+                    <% orders.forEach(function(order, index) { 
+                        const items = order.orderItems || [];
+                        const orderIdStr = order._id.toString();
+                        const showTwo = items.slice(0, 2);
+                        const restCount = items.length > 2 ? items.length - 2 : 0;
+                    %>
+                    <tr class="order-main-row" data-order-id="<%= orderIdStr %>" data-has-detail="<%= items.length > 0 ? '1' : '0' %>">
                         <td class="ps-4">
                             <div class="d-flex align-items-center">
                                 <div class="avatar-circle bg-primary-subtle text-primary me-3 fw-bold" 
@@ -87,36 +92,32 @@
                             </div>
                         </td>
 
-                        <td>
-                            <div class="d-flex flex-column gap-2">
-                                <% 
-                                const items = order.orderItems || [];
-                                if(items.length > 0) { 
-                                    items.forEach((item) => { 
-                                        const product = item.product || {};
-                                        const images = product.productImages || [];
-                                        const firstImage = images[0] || '';
-                                        const productName = product.productName || 'Unknown Product';
-                                %>
-                                <div class="d-flex align-items-center">
-                                    <% if(firstImage) { %>
-                                        <img src="/<%= firstImage %>" 
-                                             class="rounded border me-2" 
-                                             style="width: 35px; height: 35px; object-fit: cover;">
-                                    <% } else { %>
-                                        <div class="rounded border me-2 d-flex align-items-center justify-content-center bg-light text-muted"
-                                             style="width: 35px; height: 35px;">
-                                            <i class="fa-solid fa-image fa-xs"></i>
+                        <td class="order-products-cell">
+                            <div class="order-products-preview">
+                                <% if(items.length > 0) { %>
+                                    <div class="order-preview-thumbs">
+                                        <% showTwo.forEach((item) => { 
+                                            const product = item.product || {};
+                                            const images = product.productImages || [];
+                                            const firstImage = images[0] || '';
+                                        %>
+                                        <div class="order-product-thumb">
+                                            <% if(firstImage) { %>
+                                                <img src="/<%= firstImage %>" alt="" class="order-product-img">
+                                            <% } else { %>
+                                                <div class="order-product-placeholder">
+                                                    <i class="fa-solid fa-image fa-xs"></i>
+                                                </div>
+                                            <% } %>
                                         </div>
-                                    <% } %>
-                                    <div>
-                                        <div class="text-dark small fw-medium"><%= productName %></div>
-                                        <div class="text-muted" style="font-size: 11px;">
-                                            x<%= item.itemQuantity %>
-                                        </div>
+                                        <% }); %>
                                     </div>
-                                </div>
-                                <% }) } else { %>
+                                    <% if(restCount > 0) { %>
+                                        <button type="button" class="order-more-btn" data-order-id="<%= orderIdStr %>" title="Barcha mahsulotlar">
+                                            +<%= restCount %> more
+                                        </button>
+                                    <% } %>
+                                <% } else { %>
                                     <span class="text-muted small">No items</span>
                                 <% } %>
                             </div>
@@ -138,7 +139,7 @@
                             </div>
                         </td>
 
-                        <td class="text-center">
+                        <td class="text-center order-status-cell">
                             <select class="form-select form-select-sm status-select status-<%= (order.orderStatus || 'PENDING').toLowerCase() %>" 
                                     onchange="updateOrderStatus('<%= order._id %>', this.value)">
                                 <option value="PENDING" <%= order.orderStatus === 'PENDING' ? 'selected' : '' %>>PENDING</option>
@@ -149,6 +150,39 @@
                             </select>
                         </td>
                     </tr>
+                    <% if(items.length > 0) { %>
+                    <tr class="order-detail-row" id="order-detail-<%= orderIdStr %>" aria-hidden="true">
+                        <td colspan="5" class="order-detail-cell p-0">
+                            <div class="order-detail-content">
+                                <div class="order-detail-label">Barcha mahsulotlar</div>
+                                <div class="order-products-list">
+                                    <% items.forEach((item) => { 
+                                        const product = item.product || {};
+                                        const images = product.productImages || [];
+                                        const firstImage = images[0] || '';
+                                        const productName = product.productName || 'Unknown Product';
+                                    %>
+                                    <div class="order-product-row">
+                                        <div class="order-product-thumb">
+                                            <% if(firstImage) { %>
+                                                <img src="/<%= firstImage %>" alt="" class="order-product-img">
+                                            <% } else { %>
+                                                <div class="order-product-placeholder">
+                                                    <i class="fa-solid fa-image fa-xs"></i>
+                                                </div>
+                                            <% } %>
+                                        </div>
+                                        <div class="order-product-info">
+                                            <div class="order-product-name"><%= productName %></div>
+                                            <div class="order-product-qty">x<%= item.itemQuantity %></div>
+                                        </div>
+                                    </div>
+                                    <% }); %>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <% } %>
                     <% }) %>
                 </tbody>
             </table>
@@ -197,24 +231,42 @@
 <script>
     async function updateOrderStatus(id, status) {
         try {
-            // Select element rangini o'zgartirish
             const selectElement = document.querySelector(`select[onchange="updateOrderStatus('${id}', this.value)"]`);
             if(selectElement) {
                 selectElement.className = `form-select form-select-sm status-select status-${status.toLowerCase()}`;
             }
-
-            // Backendga yuborish
             const response = await axios.post(`/seller/orders/${id}`, { orderStatus: status });
-            
-            if (response.status === 200) {
-                // Muvaffaqiyatli bo'lsa, alert shart emas, rang o'zgardi
-                console.log('Status updated');
-            }
+            if (response.status === 200) console.log('Status updated');
         } catch (err) {
             console.error(err);
             alert('Failed to update status');
         }
     }
+
+    (function() {
+        function toggleOrderDetail(orderId) {
+            const row = document.getElementById('order-detail-' + orderId);
+            if (!row) return;
+            const isHidden = row.getAttribute('aria-hidden') !== 'false';
+            row.setAttribute('aria-hidden', isHidden ? 'false' : 'true');
+            row.classList.toggle('order-detail-open', isHidden);
+        }
+
+        document.querySelector('.panel .table-responsive').addEventListener('click', function(e) {
+            const moreBtn = e.target.closest('.order-more-btn');
+            const mainRow = e.target.closest('.order-main-row');
+            if (e.target.closest('.order-status-cell')) return;
+
+            if (moreBtn) {
+                e.preventDefault();
+                toggleOrderDetail(moreBtn.getAttribute('data-order-id'));
+                return;
+            }
+            if (mainRow && mainRow.getAttribute('data-has-detail') === '1') {
+                toggleOrderDetail(mainRow.getAttribute('data-order-id'));
+            }
+        });
+    })();
 </script>
 
 <%- include('includes/footer') %>

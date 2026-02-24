@@ -1,0 +1,160 @@
+<%- include('includes/header') %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+  .cart-table { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+  .cart-item-row { border-bottom: 1px solid #eee; }
+  .cart-item-row:last-child { border-bottom: none; }
+  .cart-img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; }
+  .summary-card { background: #f8f9fa; border-radius: 12px; padding: 1.5rem; }
+  .btn-place-order { padding: 12px 24px; font-weight: 600; border-radius: 10px; }
+  .empty-cart { padding: 4rem 2rem; text-align: center; }
+  .nav-customer { gap: 1rem; }
+</style>
+
+<div class="container py-4">
+  <nav class="d-flex align-items-center mb-4 nav-customer">
+    <a href="/" class="text-dark text-decoration-none"><i class="fa-solid fa-arrow-left me-1"></i> Home</a>
+    <a href="/customer/orders" class="text-dark text-decoration-none"><i class="fa-solid fa-list me-1"></i> My Orders</a>
+  </nav>
+
+  <h2 class="mb-4 fw-bold">Checkout</h2>
+
+  <div id="cartContainer">
+    <div id="cartEmpty" class="empty-cart d-none">
+      <i class="fa-solid fa-cart-shopping fa-3x text-muted mb-3"></i>
+      <p class="text-muted mb-2">Your cart is empty.</p>
+      <p class="small text-muted">Add products from the shop, then return here to place your order.</p>
+      <a href="/" class="btn btn-outline-dark mt-3">Browse</a>
+    </div>
+
+    <div id="cartContent" class="d-none">
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="cart-table">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                  <tr>
+                    <th class="border-0 py-3">Product</th>
+                    <th class="border-0 py-3">Price</th>
+                    <th class="border-0 py-3">Qty</th>
+                    <th class="border-0 py-3 text-end">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody id="cartBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 mt-4 mt-lg-0">
+          <div class="summary-card sticky-top">
+            <h5 class="fw-bold mb-3">Order Summary</h5>
+            <div class="d-flex justify-content-between mb-2"><span class="text-muted">Subtotal</span><span id="subtotal">$0.00</span></div>
+            <div class="d-flex justify-content-between mb-2 small text-muted"><span>Delivery (free over $100)</span><span id="delivery">$0.00</span></div>
+            <hr>
+            <div class="d-flex justify-content-between mb-3"><strong>Total</strong><strong id="total">$0.00</strong></div>
+            <button type="button" class="btn btn-dark w-100 btn-place-order" id="btnPlaceOrder">
+              <i class="fa-solid fa-lock me-2"></i>Place Order
+            </button>
+            <p id="placeOrderError" class="text-danger small mt-2 mb-0 d-none"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const CART_KEY = 'fenzo_cart';
+  const DELIVERY_FEE = 5;
+  const FREE_DELIVERY_THRESHOLD = 100;
+
+  function getCart() {
+    try {
+      const raw = localStorage.getItem(CART_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function setCart(items) {
+    localStorage.setItem(CART_KEY, JSON.stringify(items));
+  }
+
+  function renderCart() {
+    const cart = getCart();
+    const tbody = document.getElementById('cartBody');
+    const cartEmpty = document.getElementById('cartEmpty');
+    const cartContent = document.getElementById('cartContent');
+    const subtotalEl = document.getElementById('subtotal');
+    const deliveryEl = document.getElementById('delivery');
+    const totalEl = document.getElementById('total');
+
+    if (!cart.length) {
+      cartEmpty.classList.remove('d-none');
+      cartContent.classList.add('d-none');
+      return;
+    }
+    cartEmpty.classList.add('d-none');
+    cartContent.classList.remove('d-none');
+
+    let subtotal = 0;
+    tbody.innerHTML = cart.map(function(item) {
+      const lineTotal = (item.productPrice || 0) * (item.itemQuantity || 1);
+      subtotal += lineTotal;
+      const img = (item.productImage && item.productImage[0]) ? '/' + item.productImage[0] : '/img/upload.svg';
+      return '<tr class="cart-item-row">' +
+        '<td><div class="d-flex align-items-center"><img src="' + img + '" class="cart-img me-3" alt=""><span>' + (item.productName || 'Product') + '</span></div></td>' +
+        '<td>$' + (item.productPrice || 0).toFixed(2) + '</td>' +
+        '<td>' + (item.itemQuantity || 1) + '</td>' +
+        '<td class="text-end">$' + lineTotal.toFixed(2) + '</td></tr>';
+    }).join('');
+
+    const delivery = subtotal < FREE_DELIVERY_THRESHOLD ? DELIVERY_FEE : 0;
+    const total = subtotal + delivery;
+    subtotalEl.textContent = '$' + subtotal.toFixed(2);
+    deliveryEl.textContent = delivery ? '$' + delivery.toFixed(2) : 'Free';
+    totalEl.textContent = '$' + total.toFixed(2);
+  }
+
+  document.getElementById('btnPlaceOrder').addEventListener('click', function() {
+    const cart = getCart();
+    if (!cart.length) {
+      alert('Your cart is empty.');
+      return;
+    }
+    const payload = cart.map(function(item) {
+      return {
+        productId: item.productId,
+        itemQuantity: item.itemQuantity || 1,
+        itemPrice: item.productPrice || 0
+      };
+    });
+    const errEl = document.getElementById('placeOrderError');
+    errEl.classList.add('d-none');
+    this.disabled = true;
+    fetch('/order/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(payload)
+    })
+      .then(function(r) {
+        if (!r.ok) return r.json().then(function(d) { throw new Error(d.message || 'Order failed'); });
+        return r.json();
+      })
+      .then(function() {
+        setCart([]);
+        window.location.href = '/customer/orders';
+      })
+      .catch(function(e) {
+        errEl.textContent = e.message || 'Could not place order. Try again.';
+        errEl.classList.remove('d-none');
+      })
+      .finally(function() { document.getElementById('btnPlaceOrder').disabled = false; });
+  });
+
+  renderCart();
+})();
+</script>
+<%- include('includes/footer') %>

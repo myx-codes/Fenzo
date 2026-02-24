@@ -34,15 +34,15 @@ productController.getAllProducts = async (req: SellerRequest, res: Response) => 
       ? String(req.query.productCollection)
       : undefined;
 
-    const orderParam = String(req.query.order || "").toUpperCase();
-
+    const orderQuery = (req.query.order || "new").toString().toLowerCase();
     const order: ProductInquiry["order"] =
-      orderParam === "PRICE_ASC" ||
-      orderParam === "PRICE_DESC" ||
-      orderParam === "TOP_RATED" ||
-      orderParam === "NEWEST"
-        ? orderParam
-        : "NEWEST";
+      orderQuery === "price_low"
+        ? "PRICE_ASC"
+        : orderQuery === "price_high"
+          ? "PRICE_DESC"
+          : orderQuery === "top_rated"
+            ? "TOP_RATED"
+            : "NEWEST";
 
     const page = Number(req.query.page) || 1;
     const limit = 10;
@@ -68,7 +68,7 @@ productController.getAllProducts = async (req: SellerRequest, res: Response) => 
       products,
       search,
       productCollection: productCollectionParam,
-      order,
+      order: orderQuery,
       currentPage: page,
       totalPages,
     });
