@@ -173,10 +173,6 @@ userController.getCustomer = async (req: ExtendedRequest, res: Response) => {
 
 userController.getSeller = async (req: ExtendedRequest, res: Response) => {
     try {
-        const currentUser = req.user;
-        if (!currentUser?._id) {
-            return res.status(HttpCode.UNAUTHORIZED).json({ message: Message.NOT_AUTHENTICATED });
-        }
         const id = shapeIntoMongooseObjectId(req.params.id);
         const limit = Math.min(Number(req.query.limit) || 20, 50);
         const [user, productsAddedCount, products, productsSold, totalRevenue, topSellingProducts] = await Promise.all([

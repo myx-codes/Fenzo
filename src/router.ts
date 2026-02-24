@@ -16,13 +16,15 @@ router.post("/auth/signup", userController.signup);
 router.post("/auth/login", userController.login);
 router.post("/auth/logout", userController.logout);
 router.get("/auth/me", userController.verifyAuth, userController.getUser);
-router.get("/user/customer/:id", userController.verifyAuth, userController.getCustomer);
-router.get("/user/seller/:id", userController.verifyAuth, userController.getSeller);
 router.put("/auth/profile",
     userController.verifyAuth,
     makeUploader("users").single("userImage"),
     userController.updateProfile
 );
+
+router.get("/user/customer/:id", userController.verifyAuth, userController.getCustomer);
+router.get("/user/seller/:id", userController.retrieveAuth, userController.getSeller);
+
 router.post("/auth/profile",
     userController.verifyAuth,
     makeUploader("users").single("userImage"),
