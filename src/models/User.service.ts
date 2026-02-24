@@ -57,6 +57,39 @@ class UserService{
         return await this.userModel.findById(user._id).lean().exec() as User;
     }
 
+    public async getUser(userId: Types.ObjectId): Promise<User> {
+        const id = shapeIntoMongooseObjectId(userId);
+        const result = await this.userModel
+            .findById(id)
+            .select("-userPassword")
+            .lean()
+            .exec();
+        if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+        return result as User;
+    }
+
+    public async getCustomer(userId: Types.ObjectId): Promise<User> {
+        const id = shapeIntoMongooseObjectId(userId);
+        const result = await this.userModel
+            .findOne({ _id: id, userType: UserType.CUSTOMER })
+            .select("-userPassword")
+            .lean()
+            .exec();
+        if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+        return result as User;
+    }
+
+    public async getSeller(userId: Types.ObjectId): Promise<User> {
+        const id = shapeIntoMongooseObjectId(userId);
+        const result = await this.userModel
+            .findOne({ _id: id, userType: UserType.SELLER })
+            .select("-userPassword")
+            .lean()
+            .exec();
+        if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+        return result as User;
+    }
+
     public async updateProfile(userId: Types.ObjectId, input: UserProfileUpdateInput): Promise<User> {
         const id = shapeIntoMongooseObjectId(userId);
         const update: Record<string, unknown> = {};

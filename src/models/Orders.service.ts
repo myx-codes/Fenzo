@@ -407,6 +407,18 @@ public async getSellerRevenue(userId: ObjectId | string | Types.ObjectId): Promi
     return result.length > 0 ? result[0].total : 0;
 }
 
+/** Total quantity of products sold by seller (sum of itemQuantity) */
+public async getSellerTotalUnitsSold(userId: ObjectId | string | Types.ObjectId): Promise<number> {
+    const sid = shapeIntoMongooseObjectId(userId);
+    const sellerProducts = await this.productModel.find({ userId: sid }).distinct('_id');
+    if (sellerProducts.length === 0) return 0;
+    const result = await this.orderItemModel.aggregate([
+        { $match: { productId: { $in: sellerProducts } } },
+        { $group: { _id: null, total: { $sum: '$itemQuantity' } } }
+    ]).exec();
+    return result.length > 0 ? result[0].total : 0;
+}
+
 /** Dashboard: sales by day for last N days */
 public async getSellerSalesByDay(userId: ObjectId | string | Types.ObjectId, days: number = 7): Promise<{ date: string; revenue: number }[]> {
     const sid = shapeIntoMongooseObjectId(userId);

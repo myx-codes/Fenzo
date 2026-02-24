@@ -113,6 +113,16 @@ public async addProduct(input: ProductInput): Promise<Product> {
         });
     }
 
+    public async getSellerProducts(sellerId: Types.ObjectId, limit: number = 20): Promise<Product[]> {
+        const result = await this.productModel
+            .find({ userId: sellerId, productStatus: { $ne: "DELETE" } })
+            .sort({ createdAt: -1 })
+            .limit(limit)
+            .lean()
+            .exec();
+        return result as Product[];
+    }
+
     public async getProductDetail(id: string): Promise<Product> {
         const result = await this.productModel.findById(id).lean();
         if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
