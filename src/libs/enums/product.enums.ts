@@ -12,10 +12,10 @@ export enum ProductType {
 }
 
 export enum ProductCollection {
-    CLOTHING = "CLOTHING",
+    FASHION = "FASHION",
     PARFUM = "PARFUM",
-    COSMETICS = "COSMETICS",
-    BODY_CARE = "BODY_CARE",
+    BEAUTY = "BEAUTY",
+    HEALTH = "HEALTH",
     VITAMINS = "VITAMINS",
     ELECTRONICS = "ELECTRONICS",
     KIDS = "KIDS"
