@@ -92,13 +92,11 @@
     outline: none;
 }
 
-/* 4. Filter Panel inputlari */
+/* 4. Filter Panel inputlari (products.ejs bilan bir xil o'lcham) */
 .input-group-text, 
 .form-control, 
 .form-select {
     border-color: #e2e8f0;
-    font-size: 12px;
-    padding: 10px 15px;
 }
 
 .form-control:focus, 
