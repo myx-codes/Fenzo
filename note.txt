@@ -1,0 +1,17 @@
+pm2 commands:
+
+
+
+pm2 ls
+pm2 start dist/server.js --name=FENZO
+pm2 start "npm run start:prod" --name=FENZO_prood
+pm2 stop id
+pm2 delete id
+pm2 restart id
+pm2 monit
+pm2 kill
+
+// instances: 1,
+    // exec_mode: "cluster" or "fork"
+
+cluster: barcha GPU larni ishlatadi. yani bu scalling jarayoni deyiladi.
