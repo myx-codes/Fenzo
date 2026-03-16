@@ -8,6 +8,8 @@ import cookieParser from 'cookie-parser';
 import { MORGAN_FORMAT } from './libs/config';
 import session from 'express-session';
 import ConnectMongoDB from "connect-mongodb-session"
+import {Server as SocketIOServer} from "socket.io"
+import http from "http"
 
 
 declare module 'express-session' {
@@ -65,4 +67,24 @@ app.set('view engine', 'ejs');
 app.use('/', router); // Dizayn Pattrn (Middleware)
 app.use('/seller', routerSeller)
 
+// Socket connection
+const server = http.createServer(app);
+const io = new SocketIOServer(server,{
+  cors: {
+    origin: true,
+    credentials: true,
+  }
+});
+
+let summaryClient = 0;
+io.on("connection", (socket) => {
+  summaryClient++;
+  console.log(`Client connected: ${summaryClient}`);
+  socket.on("disconnect", () => {
+    summaryClient--;
+    console.log(`Client disconnected: ${summaryClient}`);
+  });
+});
+
+export { server };
 export default app
