@@ -15,3 +15,12 @@ pm2 kill
     // exec_mode: "cluster" or "fork"
 
 cluster: barcha GPU larni ishlatadi. yani bu scalling jarayoni deyiladi.
+
+
+
+
+# docker compose up -d
+# docker compose stop
+# docker compose start
+# docker compose restart
+# docker compose stop && # docker compose rm -f
