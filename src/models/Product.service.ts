@@ -1,7 +1,7 @@
-import { ProductStatus } from "../libs/enums/product.enums"
+import { ProductSort, ProductStatus } from "../libs/enums/product.enums"
 import { shapeIntoMongooseObjectId } from "../libs/config"
 import { Errors, HttpCode, Message } from "../libs/Errors"
-import { Product, ProductInput, ProductInquiry, ProductUpdateInput } from "../libs/types/product"
+import { Product, ProductAISearchFilters, ProductInput, ProductInquiry, ProductUpdateInput } from "../libs/types/product"
 import ProductModel from "../schema/Product.model"
 import { T } from "../libs/types/common"
 import { ObjectId, Types } from "mongoose"
@@ -9,14 +9,17 @@ import { ViewInput } from "../libs/types/view"
 import { ViewGroup } from "../libs/enums/view.enums"
 import ViewModel from "../schema/View.model"
 import ViewService from "./View.service"
+import ProductAISearchService from "./ProductAISearch.service"
 
 class ProductService {
     private readonly productModel;
     public viewService;
+    private readonly aiSearchService;
 
     constructor(){
         this.productModel = ProductModel;
         this.viewService = new ViewService()
+        this.aiSearchService = new ProductAISearchService()
     };
      
     // BSSR APIs
@@ -156,6 +159,44 @@ public async addProduct(input: ProductInput): Promise<Product> {
 
 
     // SSR APIs
+    public async aiSearchProducts(rawQuery: string, options?: { page?: number; limit?: number }): Promise<Product[]> {
+        const filters = this.aiSearchService.parseFilters(rawQuery);
+        const match: T = { productStatus: ProductStatus.ACTIVE };
+
+        if (filters.category) {
+            match.productCollection = filters.category;
+        }
+
+        if (filters.minPrice != null || filters.maxPrice != null) {
+            match.productPrice = {};
+            if (filters.minPrice != null) match.productPrice.$gte = filters.minPrice;
+            if (filters.maxPrice != null) match.productPrice.$lte = filters.maxPrice;
+        }
+
+        const terms = this.buildSearchTerms(filters);
+        if (terms.length > 0) {
+            const pattern = new RegExp(terms.map((term) => this.escapeRegex(term)).join("|"), "i");
+            match.$or = [
+                { productName: { $regex: pattern } },
+                { productDesc: { $regex: pattern } },
+            ];
+        }
+
+        const sort = this.buildAiSearchSort(filters.sort);
+        const page = options?.page && options.page > 0 ? options.page : 1;
+        const limit = options?.limit && options.limit > 0 ? Math.min(options.limit, 100) : 20;
+
+        const result = await this.productModel
+            .find(match)
+            .sort(sort)
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean()
+            .exec();
+
+        return result as Product[];
+    }
+
  public async getProducts(inquery:ProductInquiry): Promise<Product[]> {
     const match: T = {productStatus: ProductStatus.ACTIVE};
     if(inquery.productCollection)
@@ -224,6 +265,38 @@ public async addProduct(input: ProductInput): Promise<Product> {
         }
         return result;
     };
+
+    private buildAiSearchSort(sort?: ProductSort): T {
+        switch (sort) {
+            case ProductSort.PRICE_LOW:
+                return { productPrice: 1 };
+            case ProductSort.PRICE_HIGH:
+                return { productPrice: -1 };
+            case ProductSort.TOP_RATED:
+                return { productRating: -1 };
+            case ProductSort.NEWEST:
+            default:
+                return { createdAt: -1 };
+        }
+    }
+
+    private buildSearchTerms(filters: ProductAISearchFilters): string[] {
+        const terms = new Set<string>();
+
+        if (filters.keyword) {
+            const keywordParts = filters.keyword.split(/\s+/).filter(Boolean);
+            if (keywordParts.length > 0) keywordParts.forEach((part) => terms.add(part));
+            else terms.add(filters.keyword);
+        }
+
+        if (filters.color) terms.add(filters.color);
+
+        return Array.from(terms);
+    }
+
+    private escapeRegex(value: string): string {
+        return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
 
   
 };

@@ -35,6 +35,7 @@ router.post("/auth/profile",
 // Product
 router
 .get("/customer/products", productController.getProducts)
+.get("/customer/product/ai-search", productController.aiSearchProducts)
 .get("/customer/product/detail/:id",
     userController.verifyAuth,
     productController.getProduct)

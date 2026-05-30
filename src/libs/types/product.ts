@@ -4,7 +4,8 @@ import {
   ProductCollection,
   ProductType,
   ProductGender,
-  ProductUnit
+  ProductUnit,
+  ProductSort
 } from "../enums/product.enums";
 
 export interface Product {
@@ -72,4 +73,13 @@ export interface ProductInquiry {
   productCollection?: ProductCollection;
   search?: string;
   userId?: Types.ObjectId;
+}
+
+export interface ProductAISearchFilters {
+  keyword?: string;
+  category?: ProductCollection;
+  color?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  sort?: ProductSort;
 }

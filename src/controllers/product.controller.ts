@@ -13,6 +13,31 @@ const productService = new ProductService()
 
 
 // BSSR APIs
+
+productController.aiSearchProducts = async (req: Request, res: Response) => {
+  try {
+    console.log("aiSearchProducts");
+
+    const rawQueryParam = req.query.q ?? req.query.query ?? req.query.search ?? "";
+    const rawQuery = Array.isArray(rawQueryParam)
+      ? rawQueryParam.filter((item) => typeof item === "string").join(" ")
+      : typeof rawQueryParam === "string"
+        ? rawQueryParam
+        : "";
+
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(Math.max(1, Number(req.query.limit) || 10), 100);
+
+    const result = await productService.aiSearchProducts(rawQuery, { page, limit });
+    res.status(HttpCode.OK).json(result);
+
+  } catch (err) {
+    console.log("Error, aiSearchProducts:", err);
+    if (err instanceof Errors) res.status(err.code).json(err);
+    else res.status(Errors.standard.code).json(Errors.standard);
+  }
+};
+
 productController.goAddProduct = ( req: Request, res: Response) => {
     try{
         console.log("Seller, addProduct")
